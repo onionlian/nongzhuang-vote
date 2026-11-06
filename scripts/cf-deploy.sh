@@ -10,7 +10,8 @@ prefix=nongzhuang-vote
 
 rm -rf cf-dist
 mkdir -p "cf-dist/$prefix/img"
-cp -a index.html "cf-dist/$prefix/"
+cp -a index.html og.png "cf-dist/$prefix/"
+node scripts/build-pages.mjs "cf-dist/$prefix"
 find img -maxdepth 1 -type f -name '*.webp' -exec cp -a {} "cf-dist/$prefix/img/" \;
 
 # 圖檔名沒帶雜湊，瀏覽器存 1 小時；頁面每次重新驗證

@@ -4,9 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>濃妝投票所</title>
+<title>濃妝投票所｜2026 縣市長選舉惡搞小遊戲</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="惡搞專用：分四輪只看政黨、口號、外表、競選照，不看名字也不看政見。投票請認真看政見。">
+<meta name="description" content="把名字和政見蓋起來，只看政黨、口號、外表、競選照，22 縣市長任你選。純屬惡搞，投票請認真看政見。">
+<link rel="canonical" href="https://onininon.com/nongzhuang-vote/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="濃妝投票所">
+<meta property="og:title" content="濃妝投票所｜2026 縣市長選舉惡搞小遊戲">
+<meta property="og:description" content="把名字和政見蓋起來，只看政黨、口號、外表、競選照，22 縣市長任你選。純屬惡搞，投票請認真看政見。">
+<meta property="og:url" content="https://onininon.com/nongzhuang-vote/">
+<meta property="og:image" content="https://onininon.com/nongzhuang-vote/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
@@ -140,6 +150,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .crowd-round{display:grid;gap:6px;border-top:3px solid var(--ink);padding-top:8px;min-width:0}
 .crowd-round small{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em}
 .srow.mine .nm{text-decoration:underline;text-decoration-color:var(--stamp);text-decoration-thickness:3px}
+.share{display:grid;gap:10px;border:3px solid var(--ink);background:#fff;padding:16px}
+.share__btns{display:flex;flex-wrap:wrap;gap:8px}
+.share__btns .btn{font-size:16px;padding:9px 14px;text-decoration:none}
+.sh-line{background:#06c755;border-color:#06c755;color:#fff}
+.sh-fb{background:#1877f2;border-color:#1877f2;color:#fff}
+.share__url{width:100%;min-width:0;font:inherit;font-size:14px;padding:8px 10px;border:2px solid var(--ink);background:var(--paper);color:var(--ink)}
+a.county{text-decoration:none;color:inherit}
 .serious{background:var(--ink);color:var(--paper);padding:22px 20px;display:grid;gap:12px;border-radius:2px}
 .serious h3{font-family:var(--display);font-weight:900;font-size:clamp(24px,5vw,34px);margin:0;line-height:1.2;color:var(--warn)}
 .serious p{margin:0;max-width:40em}
@@ -410,10 +427,28 @@ function photoBox(c){
 
 /* ===== 頁面 ===== */
 let state=null;
+/* 正式站：每個縣市有自己的網址 /nongzhuang-vote/<縣市>/（SEO）；預覽環境沒有這個路徑，改用 #縣市 */
+const SITE = location.pathname.includes("/nongzhuang-vote") ? "/nongzhuang-vote/" : "";
+const ORIGIN_URL = "https://onininon.com/nongzhuang-vote/";
+function countyFromUrl(){
+  if(SITE){ const seg=location.pathname.slice(location.pathname.indexOf(SITE)+SITE.length).split("/")[0]; if(seg) return seg; }
+  return location.hash.replace("#","");
+}
+function nav(id){
+  if(SITE){ history.pushState({}, "", SITE + (id ? id + "/" : "")); route(); }
+  else location.hash = id || "";
+}
+function setMeta(title, desc, url){
+  document.title = title;
+  const m=(sel,attr,val)=>{ const el=document.querySelector(sel); if(el) el.setAttribute(attr,val); };
+  m('meta[name="description"]',"content",desc); m('meta[property="og:title"]',"content",title);
+  m('meta[property="og:description"]',"content",desc); m('meta[property="og:url"]',"content",url); m('link[rel="canonical"]',"href",url);
+}
+const countyDesc = d => `2026 ${d.name}長選舉惡搞小遊戲：把名字和政見蓋起來，只看政黨、口號、外表、競選照，選出你的${d.name}長。純屬惡搞，投票請認真看政見。`;
 
 function home(){
   state=null;
-  document.title="濃妝投票所";
+  setMeta("濃妝投票所｜2026 縣市長選舉惡搞小遊戲", "把名字和政見蓋起來，只看政黨、口號、外表、競選照，22 縣市長任你選。純屬惡搞，投票請認真看政見。", ORIGIN_URL);
   app.innerHTML=`
   <section class="wrap hero">
     <div class="eyebrow">2026 縣市長選舉　惡搞專用　11 月 28 日投票</div>
@@ -433,10 +468,10 @@ function home(){
     <h2 class="section-title">選你的縣市</h2>
     <p class="section-note">22 縣市、81 位縣市長候選人。每輪順序打亂、身分遮住；可以跳過，跳過的不計分。</p>
     <div class="counties">
-      ${DATA.map(d=>`<button class="county" data-go="${d.id}"><b>${d.name}</b><small>${d.cand.length} 位候選人</small></button>`).join("")}
+      ${DATA.map(d=>`<a class="county" href="${SITE?SITE+d.id+"/":"#"+d.id}" data-go="${d.id}"><b>${d.name}</b><small>${d.cand.length} 位候選人</small></a>`).join("")}
     </div>
   </section>`;
-  app.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.go});
+  app.querySelectorAll("[data-go]").forEach(b=>b.onclick=e=>{e.preventDefault();nav(b.dataset.go)});
   window.scrollTo(0,0);
 }
 
@@ -468,7 +503,7 @@ function optInner(key,c,d){
   const alts = kind==="poster" ? (POSTER_ALTS[`${d.id}-${c.n}`]||[]) : [];
   const pool = [base, ...alts.map(a=>`${base}-${a}`)];
   const file = pool.length>1 ? nextPoster(`${d.id}-${c.n}`, pool) : pool[0];
-  return `<div class="photo">${svg}<img src="img/${file}.webp" alt="" onerror="this.remove()"></div>`;
+  return `<div class="photo">${svg}<img src="${SITE}img/${file}.webp" alt="" onerror="this.remove()"></div>`;
 }
 
 function round(){
@@ -477,7 +512,7 @@ function round(){
   const list=shuffle(d.cand);
   const moreBtn = R.key==="slogan" ? (d.cand.some(c=>c.slogans.length>1) ? "有其他口號嗎" : "")
     : R.key==="poster" ? (d.cand.some(c=>(POSTER_ALTS[`${d.id}-${c.n}`]||[]).length) ? "我都不喜歡，有其他的圖片嗎" : "") : "";
-  document.title=`濃妝投票所｜${d.name}｜${R.tab}`;
+  setMeta(`${d.name}長｜濃妝投票所`, countyDesc(d), ORIGIN_URL+d.id+"/");
   app.innerHTML=`
   <section class="wrap game">
     <div class="bar"><button class="back" id="back">← 換縣市</button><span class="eyebrow">${d.name}長　第 ${i+1} / ${rounds.length} 輪</span></div>
@@ -518,13 +553,13 @@ function round(){
   document.getElementById("skip").onclick=()=>{if(locked)return;locked=true;go(null)};
   const more=document.getElementById("more");
   if(more) more.onclick=()=>{ if(locked) return; state.rot=(state.rot||0)+1; round(); };
-  document.getElementById("back").onclick=()=>{location.hash=""};
+  document.getElementById("back").onclick=()=>nav("");
   window.scrollTo(0,0);
 }
 
 /* ===== 統計：送出這局的選擇，再讀回大家的結果（onininon.com 上的 Worker + D1）=====
    預覽環境沒有 api/，失敗就整塊不顯示。選罷法第 53 條期間由 Worker 回 hidden。 */
-const API = "api/";
+const API = (location.pathname.includes("/nongzhuang-vote") ? "/nongzhuang-vote/" : "") + "api/";
 async function crowd(d, rounds, picks){
   const box = document.getElementById("crowd");
   if(!box) return;
@@ -611,6 +646,19 @@ function reveal(){
         </div>
       </div>`}).join("")}
     </div>
+    <div class="share">
+      <h3 class="section-title" style="margin:0">分享給朋友玩</h3>
+      <p class="section-note" style="margin:0">分享出去的只有遊戲連結，不會透露你選了誰。</p>
+      <div class="share__btns">
+        <button class="btn" id="shNative" hidden>分享…</button>
+        <a class="btn sh-line" id="shLine" target="_blank" rel="noopener">LINE</a>
+        <a class="btn sh-fb" id="shFb" target="_blank" rel="noopener">Facebook</a>
+        <a class="btn sh-th" id="shTh" target="_blank" rel="noopener">Threads</a>
+        <a class="btn sh-x" id="shX" target="_blank" rel="noopener">X</a>
+        <button class="btn btn--ghost" id="shCopy">複製連結</button>
+      </div>
+      <input id="shUrl" class="share__url" readonly aria-label="分享連結">
+    </div>
     <div class="again">
       <button class="btn" id="replay">${d.name}再選一次</button>
       <button class="btn btn--ghost" id="other">換別的縣市</button>
@@ -619,15 +667,39 @@ function reveal(){
   </section>`;
   crowd(d, rounds, picks);
   document.getElementById("replay").onclick=()=>start(d);
-  document.getElementById("other").onclick=()=>{location.hash=""};
+  document.getElementById("other").onclick=()=>nav("");
+  shareSetup(d);
   window.scrollTo(0,0);
 }
 
+function shareSetup(d){
+  const url = ORIGIN_URL + d.id + "/";
+  const text = `我在「濃妝投票所」只看政黨、口號、外表、競選照，選了一次${d.name}長。你猜我選誰？換你來試試。（純屬惡搞，投票請認真看政見）`;
+  const e = encodeURIComponent;
+  const set=(id,href)=>{ const a=document.getElementById(id); if(a) a.href=href; };
+  set("shLine", `https://social-plugins.line.me/lineit/share?url=${e(url)}&text=${e(text)}`);
+  set("shFb", `https://www.facebook.com/sharer/sharer.php?u=${e(url)}`);
+  set("shTh", `https://www.threads.net/intent/post?text=${e(text+" "+url)}`);
+  set("shX", `https://twitter.com/intent/tweet?text=${e(text)}&url=${e(url)}`);
+  const box=document.getElementById("shUrl"); if(box) box.value=url;
+  const copy=document.getElementById("shCopy");
+  if(copy) copy.onclick=()=>{
+    const done=()=>{ copy.textContent="已複製"; setTimeout(()=>copy.textContent="複製連結",1600); };
+    const fallback=()=>{ box.focus(); box.select(); try{ document.execCommand("copy"); done(); }catch(_){ copy.textContent="請手動複製下方連結"; } };
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text+" "+url).then(done,fallback); else fallback();
+  };
+  const nat=document.getElementById("shNative");
+  if(nat && navigator.share && SITE){ nat.hidden=false; nat.onclick=()=>navigator.share({title:"濃妝投票所",text,url}).catch(()=>{}); }
+}
+
 function route(){
-  const d=DATA.find(x=>x.id===location.hash.replace("#",""));
+  // 舊的 #縣市 連結轉到新網址
+  if(SITE && location.hash && DATA.some(x=>x.id===location.hash.slice(1))){ history.replaceState({}, "", SITE+location.hash.slice(1)+"/"); }
+  const d=DATA.find(x=>x.id===countyFromUrl());
   d?start(d):home();
 }
 window.addEventListener("hashchange",route);
+window.addEventListener("popstate",route);
 route();
 
 (function(){
