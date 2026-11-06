@@ -17,6 +17,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"濃妝投票所","url":"https://onininon.com/nongzhuang-vote/","applicationCategory":"GameApplication","operatingSystem":"Web","inLanguage":"zh-Hant-TW","description":"2026 縣市長選舉惡搞小遊戲：把名字和政見蓋起來，只看政黨、口號、外表、競選照。純屬惡搞，投票請認真看政見。","offers":{"@type":"Offer","price":"0","priceCurrency":"TWD"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
@@ -150,6 +152,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 .crowd-round{display:grid;gap:6px;border-top:3px solid var(--ink);padding-top:8px;min-width:0}
 .crowd-round small{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em}
 .srow.mine .nm{text-decoration:underline;text-decoration-color:var(--stamp);text-decoration-thickness:3px}
+.pv-nav{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 16px}
+.pv-nav a{border:2px solid var(--ink);padding:2px 8px;font-size:13px;font-weight:700;text-decoration:none;background:#fff}
+.pv-county{margin-bottom:28px}.pv-county h2{font-family:var(--display);font-size:26px;margin:0 0 10px;border-bottom:3px solid var(--ink)}
+.pv-grid{display:grid;gap:14px}
+.pv-cand{border:3px solid var(--ink);background:#fff;padding:12px;display:grid;gap:10px;min-width:0}
+.pv-cand header{display:flex;gap:10px;align-items:center}
+.pv-sl{display:grid;gap:2px;font-weight:700}.pv-sl small{color:var(--ink-soft);font-weight:400;margin-left:6px}.pv-none{color:var(--ink-soft)}
+.pv-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.pv-img{margin:0;display:grid;gap:2px;font-size:12px;color:var(--ink-soft)}.pv-img img{width:100%;aspect-ratio:3/4;object-fit:cover;border:2px solid var(--ink)}
+.pv-miss{aspect-ratio:3/4;border:2px dashed var(--ink-soft);display:grid;place-items:center;text-align:center;font-size:12px;color:var(--ink-soft);padding:6px}
 .share{display:grid;gap:10px;border:3px solid var(--ink);background:#fff;padding:16px}
 .share__btns{display:flex;flex-wrap:wrap;gap:8px}
 .share__btns .btn{font-size:16px;padding:9px 14px;text-decoration:none}
@@ -225,6 +237,19 @@ footer p{margin:0;max-width:60em}
 </div>
 
 <script>
+/* ===== Google Analytics（GA4，跟 onininon.com 其他頁面同一個資源）。只在正式網站送資料 ===== */
+const GA_ID = "G-BR87MQ8BVD";
+const GA_ON = /^(www\.)?onininon\.com$/.test(location.hostname);
+if(GA_ON){
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function(){ dataLayer.push(arguments); };
+  gtag("js", new Date());
+  gtag("config", GA_ID, { send_page_view:false });
+  const s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID; document.head.appendChild(s);
+}
+function track(name, params){ try{ if(GA_ON && window.gtag) gtag("event", name, params||{}); }catch(e){} }
+function pageView(){ track("page_view", { page_title:document.title, page_location:location.href, page_path:location.pathname }); }
+
 const PARTY = {
   "中國國民黨": {c:"#1a3f9c", t:"#fff"},
   "民主進步黨": {c:"#1f8a3c", t:"#fff"},
@@ -506,10 +531,12 @@ function optInner(key,c,d){
   return `<div class="photo">${svg}<img src="${SITE}img/${file}.webp" alt="" onerror="this.remove()"></div>`;
 }
 
-function round(){
+function round(keep){
   const {d,rounds,i}=state;
   const R=rounds[i];
-  const list=shuffle(d.cand);
+  state.order = state.order || {};
+  if(!keep || !state.order[R.key]) state.order[R.key] = shuffle(d.cand.map(c=>c.n));
+  const list = state.order[R.key].map(n=>d.cand.find(c=>c.n===n));
   const moreBtn = R.key==="slogan" ? (d.cand.some(c=>c.slogans.length>1) ? "有其他口號嗎" : "")
     : R.key==="poster" ? (d.cand.some(c=>(POSTER_ALTS[`${d.id}-${c.n}`]||[]).length) ? "我都不喜歡，有其他的圖片嗎" : "") : "";
   setMeta(`${d.name}長｜濃妝投票所`, countyDesc(d), ORIGIN_URL+d.id+"/");
@@ -549,12 +576,12 @@ function round(){
     el.onclick=()=>choose(el);
     el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose(el)}};
   });
-  function go(v){state.picks[R.key]=v; state.i++; state.i<rounds.length?round():reveal()}
+  function go(v){ const c=d.cand.find(x=>x.n===v); track(v==null?"round_skip":"round_pick",{county:d.id, round:R.key, ballot_number:v??"", party:c?c.party:""}); state.picks[R.key]=v; state.i++; state.i<rounds.length?round():reveal(); }
   document.getElementById("skip").onclick=()=>{if(locked)return;locked=true;go(null)};
   const more=document.getElementById("more");
-  if(more) more.onclick=()=>{ if(locked) return; state.rot=(state.rot||0)+1; round(); };
+  if(more) more.onclick=()=>{ if(locked) return; state.rot=(state.rot||0)+1; track("more_options",{county:d.id, round:R.key}); const y=window.scrollY; round(true); window.scrollTo(0,y); };
   document.getElementById("back").onclick=()=>nav("");
-  window.scrollTo(0,0);
+  if(!keep) window.scrollTo(0,0);
 }
 
 /* ===== 統計：送出這局的選擇，再讀回大家的結果（onininon.com 上的 Worker + D1）=====
@@ -604,6 +631,7 @@ function reveal(){
     return {c,got,of:appear.length,pct:appear.length?Math.round(got/appear.length*100):0};
   }).sort((a,b)=>b.pct-a.pct||a.c.n-b.c.n);
   const top=scores[0];
+  track("reveal",{county:d.id, answered:answered.length, top_number:answered.length?top.c.n:""});
   const v=VERDICTS[Math.floor(Math.random()*VERDICTS.length)];
   const byN=n=>d.cand.find(c=>c.n===n);
   app.innerHTML=`
@@ -666,9 +694,30 @@ function reveal(){
     <p class="mini-warn">再提醒一次：本站純屬惡搞，不代表任何投票建議，也不支持或反對任何候選人。</p>
   </section>`;
   crowd(d, rounds, picks);
-  document.getElementById("replay").onclick=()=>start(d);
+  document.getElementById("replay").onclick=()=>{ track("replay",{county:d.id}); start(d); };
   document.getElementById("other").onclick=()=>nav("");
   shareSetup(d);
+  window.scrollTo(0,0);
+}
+
+/* ===== 素材預覽（站長檢查用，不放進 sitemap、noindex）：/nongzhuang-vote/preview/ 或 #preview ===== */
+function renderPreview(){
+  setMeta("素材預覽｜濃妝投票所", "站長檢查用的素材總覽", ORIGIN_URL+"preview/");
+  let rb=document.querySelector('meta[name="robots"]'); if(!rb){ rb=document.createElement("meta"); rb.name="robots"; document.head.appendChild(rb); } rb.content="noindex,nofollow";
+  const img=(file,label)=>`<figure class="pv-img"><img loading="lazy" src="${SITE}img/${file}.webp" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'pv-miss',textContent:'缺圖（顯示內建插畫）'}))"><figcaption>${label}</figcaption></figure>`;
+  const total={cand:0,slogans:0,looks:0,posters:0};
+  const body=DATA.map(d=>`<section class="pv-county" id="pv-${d.id}"><h2>${d.name}　<small>${d.cand.length} 位</small></h2>
+    <div class="pv-grid">${d.cand.map(c=>{ total.cand++; total.slogans+=c.slogans.length;
+      const alts=POSTER_ALTS[`${d.id}-${c.n}`]||[]; const posters=[`${d.id}-${c.n}-poster`,...alts.map(a=>`${d.id}-${c.n}-poster-${a}`)];
+      const p=pc(c.party);
+      return `<article class="pv-cand"><header><span class="rnum" style="background:${p.c};color:${p.t}">${c.n}</span><div><b>${esc(c.name)}</b><br><small>${esc(c.party)}</small></div></header>
+        <div class="pv-sl">${c.slogans.length?c.slogans.map((x,i)=>`<div>${i===0?"★ ":""}「${esc(x.t)}」<small>${KIND_LABEL[x.kind]||""}</small></div>`).join(""):`<div class="pv-none">查無公開口號</div>`}</div>
+        <div class="pv-imgs">${img(`${d.id}-${c.n}-look`,"外表")}${posters.map((f,i)=>img(f, i?`競選照 ${i+1}/${posters.length}`:`競選照 主`)).join("")}</div>
+      </article>`;}).join("")}</div></section>`).join("");
+  app.innerHTML=`<section class="wrap game"><div class="bar"><button class="back" id="back">← 回首頁</button><span class="eyebrow">站長預覽　不公開</span></div>
+    <h2>素材預覽</h2><p class="mini-warn">${total.cand} 位候選人、${total.slogans} 句口號。★ 是主口號（翻牌頁顯示這句）；口號已套用遮名規則；缺圖的位置遊戲裡會顯示內建插畫。</p>
+    <nav class="pv-nav">${DATA.map(d=>`<a href="#pv-${d.id}" onclick="event.preventDefault();document.getElementById('pv-${d.id}').scrollIntoView()">${d.name}</a>`).join("")}</nav>${body}</section>`;
+  document.getElementById("back").onclick=()=>nav("");
   window.scrollTo(0,0);
 }
 
@@ -683,20 +732,25 @@ function shareSetup(d){
   set("shX", `https://twitter.com/intent/tweet?text=${e(text)}&url=${e(url)}`);
   const box=document.getElementById("shUrl"); if(box) box.value=url;
   const copy=document.getElementById("shCopy");
-  if(copy) copy.onclick=()=>{
+  ["shLine","shFb","shTh","shX"].forEach(id=>{ const a=document.getElementById(id); if(a) a.addEventListener("click",()=>track("share",{method:id.slice(2).toLowerCase(), county:d.id})); });
+  if(copy) copy.onclick=()=>{ track("share",{method:"copy", county:d.id});
     const done=()=>{ copy.textContent="已複製"; setTimeout(()=>copy.textContent="複製連結",1600); };
     const fallback=()=>{ box.focus(); box.select(); try{ document.execCommand("copy"); done(); }catch(_){ copy.textContent="請手動複製下方連結"; } };
     if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text+" "+url).then(done,fallback); else fallback();
   };
   const nat=document.getElementById("shNative");
-  if(nat && navigator.share && SITE){ nat.hidden=false; nat.onclick=()=>navigator.share({title:"濃妝投票所",text,url}).catch(()=>{}); }
+  if(nat && navigator.share && SITE){ nat.hidden=false; nat.onclick=()=>{ track("share",{method:"native", county:d.id}); navigator.share({title:"濃妝投票所",text,url}).catch(()=>{}); }; }
 }
 
 function route(){
   // 舊的 #縣市 連結轉到新網址
   if(SITE && location.hash && DATA.some(x=>x.id===location.hash.slice(1))){ history.replaceState({}, "", SITE+location.hash.slice(1)+"/"); }
   const d=DATA.find(x=>x.id===countyFromUrl());
+  const id=countyFromUrl();
+  if(id==="preview"){ renderPreview(); pageView(); return; }
+  if(d) track("county_select",{county:d.id});
   d?start(d):home();
+  pageView();
 }
 window.addEventListener("hashchange",route);
 window.addEventListener("popstate",route);
@@ -705,7 +759,7 @@ route();
 (function(){
   const gate=document.getElementById("gate"),btn=document.getElementById("gateBtn");
   gate.hidden=false;
-  btn.onclick=()=>{ gate.hidden=true; };
+  btn.onclick=()=>{ gate.hidden=true; track("gate_confirm"); };
 })();
 </script>
 

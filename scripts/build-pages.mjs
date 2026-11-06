@@ -22,6 +22,15 @@ for (const c of counties) {
   mkdirSync(`${out}/${c.id}`, { recursive: true });
   writeFileSync(`${out}/${c.id}/index.html`, p);
 }
+// 站長預覽頁：不進 sitemap、noindex
+{
+  let p = html;
+  p = sub(p, /<title>[^<]*<\/title>/, '<title>素材預覽｜濃妝投票所</title>');
+  p = sub(p, /<meta name="robots" content="[^"]*">/, '<meta name="robots" content="noindex,nofollow">');
+  p = sub(p, /<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${ORIGIN}preview/">`);
+  mkdirSync(`${out}/preview`, { recursive: true });
+  writeFileSync(`${out}/preview/index.html`, p);
+}
 const today = new Date().toISOString().slice(0, 10);
 const urls = [ORIGIN, ...counties.map(c => `${ORIGIN}${c.id}/`)];
 writeFileSync(`${out}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${u}</loc><lastmod>${today}</lastmod></url>`).join('\n')}\n</urlset>\n`);
