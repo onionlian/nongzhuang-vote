@@ -453,7 +453,7 @@ function photoBox(c){
 /* ===== 頁面 ===== */
 let state=null;
 /* 正式站：每個縣市有自己的網址 /nongzhuang-vote/<縣市>/（SEO）；預覽環境沒有這個路徑，改用 #縣市 */
-const SITE = location.pathname.includes("/nongzhuang-vote") ? "/nongzhuang-vote/" : "";
+const SITE = GA_ON ? "/nongzhuang-vote/" : "";  // 只有正式站用 /縣市/ 網址；本機（MAMP、直接開檔）與預覽用 #縣市
 const ORIGIN_URL = "https://onininon.com/nongzhuang-vote/";
 function countyFromUrl(){
   if(SITE){ const seg=location.pathname.slice(location.pathname.indexOf(SITE)+SITE.length).split("/")[0]; if(seg) return seg; }
@@ -586,7 +586,7 @@ function round(keep){
 
 /* ===== 統計：送出這局的選擇，再讀回大家的結果（onininon.com 上的 Worker + D1）=====
    預覽環境沒有 api/，失敗就整塊不顯示。選罷法第 53 條期間由 Worker 回 hidden。 */
-const API = (location.pathname.includes("/nongzhuang-vote") ? "/nongzhuang-vote/" : "") + "api/";
+const API = (GA_ON ? "/nongzhuang-vote/" : "") + "api/";
 async function crowd(d, rounds, picks){
   const box = document.getElementById("crowd");
   if(!box) return;
@@ -700,7 +700,7 @@ function reveal(){
   window.scrollTo(0,0);
 }
 
-/* ===== 素材預覽（站長檢查用，不放進 sitemap、noindex）：/nongzhuang-vote/preview/ 或 #preview ===== */
+/* ===== 素材預覽（站長檢查用）：只在本機開，例如直接開 index.html 再加 #preview；正式站 onininon.com 不提供 ===== */
 function renderPreview(){
   setMeta("素材預覽｜濃妝投票所", "站長檢查用的素材總覽", ORIGIN_URL+"preview/");
   let rb=document.querySelector('meta[name="robots"]'); if(!rb){ rb=document.createElement("meta"); rb.name="robots"; document.head.appendChild(rb); } rb.content="noindex,nofollow";
@@ -747,7 +747,7 @@ function route(){
   if(SITE && location.hash && DATA.some(x=>x.id===location.hash.slice(1))){ history.replaceState({}, "", SITE+location.hash.slice(1)+"/"); }
   const d=DATA.find(x=>x.id===countyFromUrl());
   const id=countyFromUrl();
-  if(id==="preview"){ renderPreview(); pageView(); return; }
+  if(id==="preview" && !GA_ON){ renderPreview(); return; }  // 素材預覽只在本機開，正式站沒有
   if(d) track("county_select",{county:d.id});
   d?start(d):home();
   pageView();
