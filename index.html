@@ -193,7 +193,7 @@ footer p{margin:0;max-width:60em}
     <p class="big-foot">再說一次：這是惡搞網站。</p>
     <p><strong>真正的民主國家好公民，投票前會看政見。</strong>本站故意只給你看政黨、口號、外表和競選照，是為了讓你發現這樣選有多荒謬，不是教你這樣選。</p>
     <p>致敬並反轉自 <a href="https://blindvote.app" target="_blank" rel="noopener">留白投票所 blindvote.app</a>：他們遮名字只看政見，我們遮政見只看門面。要認真比較政見，請去那裡，或看中選會的選舉公報。</p>
-    <p>本站不支持、不反對任何候選人或政黨。號次與黨籍依中選會號次抽籤結果（2026-10-27）；口號整理自候選人公開活動與新聞報導，標註「抽籤喊話」「競選主軸」者不一定是正式口號，若有錯誤以候選人官方為準。口號裡出現候選人名字中兩個以上的字才會遮住，只有一個字照原文。外表與競選照兩輪是本站原創插畫，與候選人本人及官方文宣無關。</p>
+    <p>本站不支持、不反對任何候選人或政黨。號次與黨籍依中選會號次抽籤結果（2026-10-27）；口號整理自候選人公開活動與新聞報導，標註「抽籤喊話」「競選主軸」者不一定是正式口號，若有錯誤以候選人官方為準。口號裡出現候選人名字中兩個以上的字才會遮住，只有一個字照原文。外表與競選照兩輪是插畫重繪，不是候選人官方文宣；頭像為統一卡通臉，不代表候選人本人長相。</p>
     <p>資料整理：2026-11-06。</p>
   </div>
 </footer>
@@ -436,8 +436,18 @@ function start(d){
   round();
 }
 
-/* 競選照輪替：編號 → 額外版本後綴，例如 "taipei-3":["2"] 會在 taipei-3-poster 與 taipei-3-poster-2 之間隨機選一張 */
-const POSTER_ALTS = {"taipei-3":["2"], "taipei-5":["2"]};
+/* 競選照輪替：編號 → 額外版本後綴，依順序輪流出現（第一張是主競選照，每次進第四輪換下一張）。
+   檔名是 {編號}-poster.webp、{編號}-poster-{後綴}.webp */
+const POSTER_ALTS = {
+  "taipei-3": ["2","3","4","5","6","11","12","13","14","15","16"],
+  "taipei-5": ["2","6","7","8","9","10","11","12","13","14","15"]
+};
+function nextPoster(key, pool){
+  let i = 0;
+  try{ i = (parseInt(localStorage.getItem("nzv-rot-"+key)||"-1",10)+1) % pool.length; localStorage.setItem("nzv-rot-"+key, String(i)); }
+  catch(e){ i = Math.floor(Math.random()*pool.length); }
+  return pool[i];
+}
 function optInner(key,c,d){
   const p=pc(c.party);
   if(key==="party") return `<div class="flag" style="--pc:${p.c};--pt:${p.t}"><b>${esc(c.party)}</b></div>`;
@@ -447,7 +457,7 @@ function optInner(key,c,d){
   const base = `${d.id}-${c.n}-${kind}`;
   const alts = kind==="poster" ? (POSTER_ALTS[`${d.id}-${c.n}`]||[]) : [];
   const pool = [base, ...alts.map(a=>`${base}-${a}`)];
-  const file = pool[Math.floor(Math.random()*pool.length)];
+  const file = pool.length>1 ? nextPoster(`${d.id}-${c.n}`, pool) : pool[0];
   return `<div class="photo">${svg}<img src="img/${file}.webp" alt="" onerror="this.remove()"></div>`;
 }
 
