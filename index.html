@@ -229,7 +229,7 @@ const N = (n,name,party,s,kind,full)=>({n,name,party,s:maskName(full||s||"",name
 const DATA = [
  {id:"taipei",name:"台北市",cand:[
    N(1,"郭璽","台灣麻將最大黨"), N(2,"林志成","無黨籍"),
-   N(3,"沈伯洋","民主進步黨","台北靠3","口號"), N(4,"蕭文乾","臺灣SoR無法黨"),
+   N(3,"沈伯洋","民主進步黨","台北順起來","口號"), N(4,"蕭文乾","臺灣SoR無法黨"),
    N(5,"蔣萬安","中國國民黨","台北▇可","口號","台北安可"), N(6,"唐新民","三勢團結促進聯盟")]},
  {id:"newtaipei",name:"新北市",cand:[
    N(1,"蘇巧慧","民主進步黨","新世代，扛起新時代","口號"), N(2,"蘇輝湟","無黨籍"),
@@ -291,7 +291,17 @@ const DATA = [
    N(6,"梁文韜","無黨籍","三不要、十大願景","主軸"), N(7,"黃世團","無黨籍")]},
  {id:"lienchiang",name:"連江縣",cand:[ N(1,"王忠銘","中國國民黨","一起走對的路","喊話"), N(2,"曹爾元","無黨籍")]}
 ];
-const KIND_LABEL = {"口號":"競選口號","主軸":"競選主軸","喊話":"抽籤喊話"};
+const KIND_LABEL = {"口號":"競選口號","主軸":"競選主軸","喊話":"抽籤喊話","應援":"應援小物","活動":"造勢活動","網站":"競選網站"};
+/* 其他競選期間常喊的口號（主口號之外），依序在「有其他口號嗎」輪流出現。[口號, 類型] */
+const MORE_SLOGANS = {
+  "taipei-3": [["FUTURE SOON","口號"],["你的市長","口號"],["台北大洋流，航向新未來","活動"],["台北靠3","喊話"],["選伯洋就OK","喊話"],["市長，你給我聽好了","網站"]],
+  "taipei-5": [["萬安挺你，攜手同行","主軸"],["為當下喝采，讓美好延續","主軸"],["台北5告讚，支持蔣萬安","喊話"],["一起安可","應援"],["台北發發發","應援"],["安打安打全壘打","應援"]]
+};
+DATA.forEach(d=>d.cand.forEach(c=>{
+  const list = c.s ? [{t:c.s,kind:c.kind}] : [];
+  (MORE_SLOGANS[`${d.id}-${c.n}`]||[]).forEach(([t,kind])=>{ const m=maskName(t,c.name); if(!list.some(x=>x.t===m)) list.push({t:m,kind}); });
+  c.slogans = list;
+}));
 const ROUNDS = [
   {key:"party",  tab:"政黨",   title:"第一輪：政黨",   ask:"只看政黨，哪一個最順眼？", warn:"政黨不等於政見。同一個黨的縣市長，政見也可能差很多。"},
   {key:"slogan", tab:"口號",   title:"第二輪：口號",   ask:"只看口號，哪一句最打動你？", warn:"口號越短越好記，但它不會告訴你錢從哪裡來。"},
@@ -431,8 +441,8 @@ function home(){
 }
 
 function start(d){
-  const rounds=ROUNDS.filter(r=> r.key!=="slogan" || d.cand.filter(c=>c.s).length>=2);
-  state={d,rounds,i:0,picks:{}};
+  const rounds=ROUNDS.slice();
+  state={d,rounds,i:0,picks:{},rot:0};
   round();
 }
 
@@ -451,7 +461,7 @@ function nextPoster(key, pool){
 function optInner(key,c,d){
   const p=pc(c.party);
   if(key==="party") return `<div class="flag" style="--pc:${p.c};--pt:${p.t}"><b>${esc(c.party)}</b></div>`;
-  if(key==="slogan") return `<div class="banner"><q>${esc(c.s)}</q><small>${KIND_LABEL[c.kind]||""}</small></div>`;
+  if(key==="slogan"){ if(!c.slogans.length) return `<div class="banner"><q class="none">查無公開口號</q><small>這位候選人沒有找到競選口號</small></div>`; const sl=c.slogans[(state?.rot||0)%c.slogans.length]; return `<div class="banner"><q>${esc(sl.t)}</q><small>${KIND_LABEL[sl.kind]||""}</small></div>`; }
   const kind = key==="look" ? "look" : "poster";
   const svg = key==="look" ? lookArt(c,d) : posterArt(c,d);
   const base = `${d.id}-${c.n}-${kind}`;
@@ -464,7 +474,9 @@ function optInner(key,c,d){
 function round(){
   const {d,rounds,i}=state;
   const R=rounds[i];
-  const list=shuffle(R.key==="slogan"?d.cand.filter(c=>c.s):d.cand);
+  const list=shuffle(d.cand);
+  const moreBtn = R.key==="slogan" ? (d.cand.some(c=>c.slogans.length>1) ? "有其他口號嗎" : "")
+    : R.key==="poster" ? (d.cand.some(c=>(POSTER_ALTS[`${d.id}-${c.n}`]||[]).length) ? "我都不喜歡，有其他的圖片嗎" : "") : "";
   document.title=`濃妝投票所｜${d.name}｜${R.tab}`;
   app.innerHTML=`
   <section class="wrap game">
@@ -484,6 +496,7 @@ function round(){
       </div>`).join("")}
     </div>
     <div class="cta">
+      ${moreBtn?`<button class="btn btn--ghost" id="more">${moreBtn}</button>`:""}
       <button class="skip" id="skip">這輪跳過</button>
     </div>
   </section>`;
@@ -503,6 +516,8 @@ function round(){
   });
   function go(v){state.picks[R.key]=v; state.i++; state.i<rounds.length?round():reveal()}
   document.getElementById("skip").onclick=()=>{if(locked)return;locked=true;go(null)};
+  const more=document.getElementById("more");
+  if(more) more.onclick=()=>{ if(locked) return; state.rot=(state.rot||0)+1; round(); };
   document.getElementById("back").onclick=()=>{location.hash=""};
   window.scrollTo(0,0);
 }
@@ -549,7 +564,7 @@ function reveal(){
   const {d,rounds,picks}=state;
   const answered=rounds.filter(r=>picks[r.key]!=null);
   const scores=d.cand.map(c=>{
-    const appear=answered.filter(r=>r.key!=="slogan"||c.s);
+    const appear=answered;
     const got=appear.filter(r=>picks[r.key]===c.n).length;
     return {c,got,of:appear.length,pct:appear.length?Math.round(got/appear.length*100):0};
   }).sort((a,b)=>b.pct-a.pct||a.c.n-b.c.n);
