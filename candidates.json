@@ -1,0 +1,731 @@
+[
+  {
+    "county": "台北市",
+    "county_id": "taipei",
+    "number": 1,
+    "name": "郭璽",
+    "party": "台灣麻將最大黨",
+    "look": "taipei-1-look.webp",
+    "poster": "taipei-1-poster.webp"
+  },
+  {
+    "county": "台北市",
+    "county_id": "taipei",
+    "number": 2,
+    "name": "林志成",
+    "party": "無黨籍",
+    "look": "taipei-2-look.webp",
+    "poster": "taipei-2-poster.webp"
+  },
+  {
+    "county": "台北市",
+    "county_id": "taipei",
+    "number": 3,
+    "name": "沈伯洋",
+    "party": "民主進步黨",
+    "look": "taipei-3-look.webp",
+    "poster": "taipei-3-poster.webp"
+  },
+  {
+    "county": "台北市",
+    "county_id": "taipei",
+    "number": 4,
+    "name": "蕭文乾",
+    "party": "臺灣SoR無法黨",
+    "look": "taipei-4-look.webp",
+    "poster": "taipei-4-poster.webp"
+  },
+  {
+    "county": "台北市",
+    "county_id": "taipei",
+    "number": 5,
+    "name": "蔣萬安",
+    "party": "中國國民黨",
+    "look": "taipei-5-look.webp",
+    "poster": "taipei-5-poster.webp"
+  },
+  {
+    "county": "台北市",
+    "county_id": "taipei",
+    "number": 6,
+    "name": "唐新民",
+    "party": "三勢團結促進聯盟",
+    "look": "taipei-6-look.webp",
+    "poster": "taipei-6-poster.webp"
+  },
+  {
+    "county": "新北市",
+    "county_id": "newtaipei",
+    "number": 1,
+    "name": "蘇巧慧",
+    "party": "民主進步黨",
+    "look": "newtaipei-1-look.webp",
+    "poster": "newtaipei-1-poster.webp"
+  },
+  {
+    "county": "新北市",
+    "county_id": "newtaipei",
+    "number": 2,
+    "name": "蘇輝湟",
+    "party": "無黨籍",
+    "look": "newtaipei-2-look.webp",
+    "poster": "newtaipei-2-poster.webp"
+  },
+  {
+    "county": "新北市",
+    "county_id": "newtaipei",
+    "number": 3,
+    "name": "李四川",
+    "party": "中國國民黨",
+    "look": "newtaipei-3-look.webp",
+    "poster": "newtaipei-3-poster.webp"
+  },
+  {
+    "county": "桃園市",
+    "county_id": "taoyuan",
+    "number": 1,
+    "name": "黃世杰",
+    "party": "民主進步黨",
+    "look": "taoyuan-1-look.webp",
+    "poster": "taoyuan-1-poster.webp"
+  },
+  {
+    "county": "桃園市",
+    "county_id": "taoyuan",
+    "number": 2,
+    "name": "張善政",
+    "party": "中國國民黨",
+    "look": "taoyuan-2-look.webp",
+    "poster": "taoyuan-2-poster.webp"
+  },
+  {
+    "county": "台中市",
+    "county_id": "taichung",
+    "number": 1,
+    "name": "何欣純",
+    "party": "民主進步黨",
+    "look": "taichung-1-look.webp",
+    "poster": "taichung-1-poster.webp"
+  },
+  {
+    "county": "台中市",
+    "county_id": "taichung",
+    "number": 2,
+    "name": "洪麗華",
+    "party": "司法正義黨",
+    "look": "taichung-2-look.webp",
+    "poster": "taichung-2-poster.webp"
+  },
+  {
+    "county": "台中市",
+    "county_id": "taichung",
+    "number": 3,
+    "name": "江啟臣",
+    "party": "中國國民黨",
+    "look": "taichung-3-look.webp",
+    "poster": "taichung-3-poster.webp"
+  },
+  {
+    "county": "台南市",
+    "county_id": "tainan",
+    "number": 1,
+    "name": "蕭燐洪",
+    "party": "臺灣SoR無法黨",
+    "look": "tainan-1-look.webp",
+    "poster": "tainan-1-poster.webp"
+  },
+  {
+    "county": "台南市",
+    "county_id": "tainan",
+    "number": 2,
+    "name": "謝龍介",
+    "party": "中國國民黨",
+    "look": "tainan-2-look.webp",
+    "poster": "tainan-2-poster.webp"
+  },
+  {
+    "county": "台南市",
+    "county_id": "tainan",
+    "number": 3,
+    "name": "陳亭妃",
+    "party": "民主進步黨",
+    "look": "tainan-3-look.webp",
+    "poster": "tainan-3-poster.webp"
+  },
+  {
+    "county": "台南市",
+    "county_id": "tainan",
+    "number": 4,
+    "name": "葉人文",
+    "party": "無黨籍",
+    "look": "tainan-4-look.webp",
+    "poster": "tainan-4-poster.webp"
+  },
+  {
+    "county": "高雄市",
+    "county_id": "kaohsiung",
+    "number": 1,
+    "name": "張靜",
+    "party": "司法改革黨",
+    "look": "kaohsiung-1-look.webp",
+    "poster": "kaohsiung-1-poster.webp"
+  },
+  {
+    "county": "高雄市",
+    "county_id": "kaohsiung",
+    "number": 2,
+    "name": "王肇民",
+    "party": "無黨籍",
+    "look": "kaohsiung-2-look.webp",
+    "poster": "kaohsiung-2-poster.webp"
+  },
+  {
+    "county": "高雄市",
+    "county_id": "kaohsiung",
+    "number": 3,
+    "name": "柯志恩",
+    "party": "中國國民黨",
+    "look": "kaohsiung-3-look.webp",
+    "poster": "kaohsiung-3-poster.webp"
+  },
+  {
+    "county": "高雄市",
+    "county_id": "kaohsiung",
+    "number": 4,
+    "name": "洪方隆",
+    "party": "無黨籍",
+    "look": "kaohsiung-4-look.webp",
+    "poster": "kaohsiung-4-poster.webp"
+  },
+  {
+    "county": "高雄市",
+    "county_id": "kaohsiung",
+    "number": 5,
+    "name": "賴瑞隆",
+    "party": "民主進步黨",
+    "look": "kaohsiung-5-look.webp",
+    "poster": "kaohsiung-5-poster.webp"
+  },
+  {
+    "county": "基隆市",
+    "county_id": "keelung",
+    "number": 1,
+    "name": "童子瑋",
+    "party": "民主進步黨",
+    "look": "keelung-1-look.webp",
+    "poster": "keelung-1-poster.webp"
+  },
+  {
+    "county": "基隆市",
+    "county_id": "keelung",
+    "number": 2,
+    "name": "魏造文",
+    "party": "無黨籍",
+    "look": "keelung-2-look.webp",
+    "poster": "keelung-2-poster.webp"
+  },
+  {
+    "county": "基隆市",
+    "county_id": "keelung",
+    "number": 3,
+    "name": "謝國樑",
+    "party": "中國國民黨",
+    "look": "keelung-3-look.webp",
+    "poster": "keelung-3-poster.webp"
+  },
+  {
+    "county": "新竹市",
+    "county_id": "hsinchucity",
+    "number": 1,
+    "name": "高虹安",
+    "party": "無黨籍",
+    "look": "hsinchucity-1-look.webp",
+    "poster": "hsinchucity-1-poster.webp"
+  },
+  {
+    "county": "新竹市",
+    "county_id": "hsinchucity",
+    "number": 2,
+    "name": "何志勇",
+    "party": "無黨籍",
+    "look": "hsinchucity-2-look.webp",
+    "poster": "hsinchucity-2-poster.webp"
+  },
+  {
+    "county": "新竹市",
+    "county_id": "hsinchucity",
+    "number": 3,
+    "name": "莊競程",
+    "party": "民主進步黨",
+    "look": "hsinchucity-3-look.webp",
+    "poster": "hsinchucity-3-poster.webp"
+  },
+  {
+    "county": "新竹縣",
+    "county_id": "hsinchucounty",
+    "number": 1,
+    "name": "鄭朝方",
+    "party": "民主進步黨",
+    "look": "hsinchucounty-1-look.webp",
+    "poster": "hsinchucounty-1-poster.webp"
+  },
+  {
+    "county": "新竹縣",
+    "county_id": "hsinchucounty",
+    "number": 2,
+    "name": "徐欣瑩",
+    "party": "中國國民黨",
+    "look": "hsinchucounty-2-look.webp",
+    "poster": "hsinchucounty-2-poster.webp"
+  },
+  {
+    "county": "新竹縣",
+    "county_id": "hsinchucounty",
+    "number": 3,
+    "name": "朱定瑀",
+    "party": "無黨籍",
+    "look": "hsinchucounty-3-look.webp",
+    "poster": "hsinchucounty-3-poster.webp"
+  },
+  {
+    "county": "苗栗縣",
+    "county_id": "miaoli",
+    "number": 1,
+    "name": "陳品安",
+    "party": "民主進步黨",
+    "look": "miaoli-1-look.webp",
+    "poster": "miaoli-1-poster.webp"
+  },
+  {
+    "county": "苗栗縣",
+    "county_id": "miaoli",
+    "number": 2,
+    "name": "鍾東錦",
+    "party": "中國國民黨",
+    "look": "miaoli-2-look.webp",
+    "poster": "miaoli-2-poster.webp"
+  },
+  {
+    "county": "彰化縣",
+    "county_id": "changhua",
+    "number": 1,
+    "name": "陳素月",
+    "party": "民主進步黨",
+    "look": "changhua-1-look.webp",
+    "poster": "changhua-1-poster.webp"
+  },
+  {
+    "county": "彰化縣",
+    "county_id": "changhua",
+    "number": 2,
+    "name": "魏平政",
+    "party": "中國國民黨",
+    "look": "changhua-2-look.webp",
+    "poster": "changhua-2-poster.webp"
+  },
+  {
+    "county": "彰化縣",
+    "county_id": "changhua",
+    "number": 3,
+    "name": "邱建富",
+    "party": "無黨籍",
+    "look": "changhua-3-look.webp",
+    "poster": "changhua-3-poster.webp"
+  },
+  {
+    "county": "彰化縣",
+    "county_id": "changhua",
+    "number": 4,
+    "name": "陳重嘉",
+    "party": "無黨籍",
+    "look": "changhua-4-look.webp",
+    "poster": "changhua-4-poster.webp"
+  },
+  {
+    "county": "南投縣",
+    "county_id": "nantou",
+    "number": 1,
+    "name": "許淑華",
+    "party": "中國國民黨",
+    "look": "nantou-1-look.webp",
+    "poster": "nantou-1-poster.webp"
+  },
+  {
+    "county": "南投縣",
+    "county_id": "nantou",
+    "number": 2,
+    "name": "温世政",
+    "party": "民主進步黨",
+    "look": "nantou-2-look.webp",
+    "poster": "nantou-2-poster.webp"
+  },
+  {
+    "county": "雲林縣",
+    "county_id": "yunlin",
+    "number": 1,
+    "name": "吳炳輝",
+    "party": "無黨籍",
+    "look": "yunlin-1-look.webp",
+    "poster": "yunlin-1-poster.webp"
+  },
+  {
+    "county": "雲林縣",
+    "county_id": "yunlin",
+    "number": 2,
+    "name": "張嘉郡",
+    "party": "中國國民黨",
+    "look": "yunlin-2-look.webp",
+    "poster": "yunlin-2-poster.webp"
+  },
+  {
+    "county": "雲林縣",
+    "county_id": "yunlin",
+    "number": 3,
+    "name": "劉建國",
+    "party": "民主進步黨",
+    "look": "yunlin-3-look.webp",
+    "poster": "yunlin-3-poster.webp"
+  },
+  {
+    "county": "雲林縣",
+    "county_id": "yunlin",
+    "number": 4,
+    "name": "林佳瑜",
+    "party": "無黨籍",
+    "look": "yunlin-4-look.webp",
+    "poster": "yunlin-4-poster.webp"
+  },
+  {
+    "county": "嘉義市",
+    "county_id": "chiayicity",
+    "number": 1,
+    "name": "王義成",
+    "party": "無黨籍",
+    "look": "chiayicity-1-look.webp",
+    "poster": "chiayicity-1-poster.webp"
+  },
+  {
+    "county": "嘉義市",
+    "county_id": "chiayicity",
+    "number": 2,
+    "name": "陳愷璜",
+    "party": "無黨籍",
+    "look": "chiayicity-2-look.webp",
+    "poster": "chiayicity-2-poster.webp"
+  },
+  {
+    "county": "嘉義市",
+    "county_id": "chiayicity",
+    "number": 3,
+    "name": "張啓楷",
+    "party": "台灣民眾黨",
+    "look": "chiayicity-3-look.webp",
+    "poster": "chiayicity-3-poster.webp"
+  },
+  {
+    "county": "嘉義市",
+    "county_id": "chiayicity",
+    "number": 4,
+    "name": "王美惠",
+    "party": "民主進步黨",
+    "look": "chiayicity-4-look.webp",
+    "poster": "chiayicity-4-poster.webp"
+  },
+  {
+    "county": "嘉義市",
+    "county_id": "chiayicity",
+    "number": 5,
+    "name": "黃宏成台灣阿成世界偉人財神總統",
+    "party": "無黨籍",
+    "look": "chiayicity-5-look.webp",
+    "poster": "chiayicity-5-poster.webp"
+  },
+  {
+    "county": "嘉義縣",
+    "county_id": "chiayicounty",
+    "number": 1,
+    "name": "吳品叡",
+    "party": "無黨籍",
+    "look": "chiayicounty-1-look.webp",
+    "poster": "chiayicounty-1-poster.webp"
+  },
+  {
+    "county": "嘉義縣",
+    "county_id": "chiayicounty",
+    "number": 2,
+    "name": "蔡易餘",
+    "party": "民主進步黨",
+    "look": "chiayicounty-2-look.webp",
+    "poster": "chiayicounty-2-poster.webp"
+  },
+  {
+    "county": "屏東縣",
+    "county_id": "pingtung",
+    "number": 1,
+    "name": "蘇清泉",
+    "party": "中國國民黨",
+    "look": "pingtung-1-look.webp",
+    "poster": "pingtung-1-poster.webp"
+  },
+  {
+    "county": "屏東縣",
+    "county_id": "pingtung",
+    "number": 2,
+    "name": "周春米",
+    "party": "民主進步黨",
+    "look": "pingtung-2-look.webp",
+    "poster": "pingtung-2-poster.webp"
+  },
+  {
+    "county": "宜蘭縣",
+    "county_id": "yilan",
+    "number": 1,
+    "name": "林國漳",
+    "party": "民主進步黨",
+    "look": "yilan-1-look.webp",
+    "poster": "yilan-1-poster.webp"
+  },
+  {
+    "county": "宜蘭縣",
+    "county_id": "yilan",
+    "number": 2,
+    "name": "陳宏毅",
+    "party": "無黨籍",
+    "look": "yilan-2-look.webp",
+    "poster": "yilan-2-poster.webp"
+  },
+  {
+    "county": "宜蘭縣",
+    "county_id": "yilan",
+    "number": 3,
+    "name": "吳宗憲",
+    "party": "中國國民黨",
+    "look": "yilan-3-look.webp",
+    "poster": "yilan-3-poster.webp"
+  },
+  {
+    "county": "宜蘭縣",
+    "county_id": "yilan",
+    "number": 4,
+    "name": "劉燦輝",
+    "party": "無黨籍",
+    "look": "yilan-4-look.webp",
+    "poster": "yilan-4-poster.webp"
+  },
+  {
+    "county": "宜蘭縣",
+    "county_id": "yilan",
+    "number": 5,
+    "name": "楊鉯婷",
+    "party": "無黨籍",
+    "look": "yilan-5-look.webp",
+    "poster": "yilan-5-poster.webp"
+  },
+  {
+    "county": "花蓮縣",
+    "county_id": "hualien",
+    "number": 1,
+    "name": "魏嘉賢",
+    "party": "無黨籍",
+    "look": "hualien-1-look.webp",
+    "poster": "hualien-1-poster.webp"
+  },
+  {
+    "county": "花蓮縣",
+    "county_id": "hualien",
+    "number": 2,
+    "name": "張峻",
+    "party": "無黨籍",
+    "look": "hualien-2-look.webp",
+    "poster": "hualien-2-poster.webp"
+  },
+  {
+    "county": "花蓮縣",
+    "county_id": "hualien",
+    "number": 3,
+    "name": "游淑貞",
+    "party": "中國國民黨",
+    "look": "hualien-3-look.webp",
+    "poster": "hualien-3-poster.webp"
+  },
+  {
+    "county": "花蓮縣",
+    "county_id": "hualien",
+    "number": 4,
+    "name": "羅佩秦",
+    "party": "台灣工黨",
+    "look": "hualien-4-look.webp",
+    "poster": "hualien-4-poster.webp"
+  },
+  {
+    "county": "台東縣",
+    "county_id": "taitung",
+    "number": 1,
+    "name": "李吳穎智",
+    "party": "無黨籍",
+    "look": "taitung-1-look.webp",
+    "poster": "taitung-1-poster.webp"
+  },
+  {
+    "county": "台東縣",
+    "county_id": "taitung",
+    "number": 2,
+    "name": "陳瑩",
+    "party": "民主進步黨",
+    "look": "taitung-2-look.webp",
+    "poster": "taitung-2-poster.webp"
+  },
+  {
+    "county": "台東縣",
+    "county_id": "taitung",
+    "number": 3,
+    "name": "王志偉",
+    "party": "無黨籍",
+    "look": "taitung-3-look.webp",
+    "poster": "taitung-3-poster.webp"
+  },
+  {
+    "county": "台東縣",
+    "county_id": "taitung",
+    "number": 4,
+    "name": "吳秀華",
+    "party": "中國國民黨",
+    "look": "taitung-4-look.webp",
+    "poster": "taitung-4-poster.webp"
+  },
+  {
+    "county": "澎湖縣",
+    "county_id": "penghu",
+    "number": 1,
+    "name": "許智富",
+    "party": "無黨籍",
+    "look": "penghu-1-look.webp",
+    "poster": "penghu-1-poster.webp"
+  },
+  {
+    "county": "澎湖縣",
+    "county_id": "penghu",
+    "number": 2,
+    "name": "周倪安",
+    "party": "台灣團結聯盟",
+    "look": "penghu-2-look.webp",
+    "poster": "penghu-2-poster.webp"
+  },
+  {
+    "county": "澎湖縣",
+    "county_id": "penghu",
+    "number": 3,
+    "name": "葉竹林",
+    "party": "無黨籍",
+    "look": "penghu-3-look.webp",
+    "poster": "penghu-3-poster.webp"
+  },
+  {
+    "county": "澎湖縣",
+    "county_id": "penghu",
+    "number": 4,
+    "name": "吳淑瑾",
+    "party": "民主進步黨",
+    "look": "penghu-4-look.webp",
+    "poster": "penghu-4-poster.webp"
+  },
+  {
+    "county": "澎湖縣",
+    "county_id": "penghu",
+    "number": 5,
+    "name": "陳振中",
+    "party": "中國國民黨",
+    "look": "penghu-5-look.webp",
+    "poster": "penghu-5-poster.webp"
+  },
+  {
+    "county": "澎湖縣",
+    "county_id": "penghu",
+    "number": 6,
+    "name": "陳盡川",
+    "party": "無黨籍",
+    "look": "penghu-6-look.webp",
+    "poster": "penghu-6-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 1,
+    "name": "張國威",
+    "party": "無黨籍",
+    "look": "kinmen-1-look.webp",
+    "poster": "kinmen-1-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 2,
+    "name": "李文良",
+    "party": "無黨籍",
+    "look": "kinmen-2-look.webp",
+    "poster": "kinmen-2-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 3,
+    "name": "洪和成",
+    "party": "無黨籍",
+    "look": "kinmen-3-look.webp",
+    "poster": "kinmen-3-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 4,
+    "name": "張火木",
+    "party": "無黨籍",
+    "look": "kinmen-4-look.webp",
+    "poster": "kinmen-4-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 5,
+    "name": "陳玉珍",
+    "party": "中國國民黨",
+    "look": "kinmen-5-look.webp",
+    "poster": "kinmen-5-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 6,
+    "name": "梁文韜",
+    "party": "無黨籍",
+    "look": "kinmen-6-look.webp",
+    "poster": "kinmen-6-poster.webp"
+  },
+  {
+    "county": "金門縣",
+    "county_id": "kinmen",
+    "number": 7,
+    "name": "黃世團",
+    "party": "無黨籍",
+    "look": "kinmen-7-look.webp",
+    "poster": "kinmen-7-poster.webp"
+  },
+  {
+    "county": "連江縣",
+    "county_id": "lienchiang",
+    "number": 1,
+    "name": "王忠銘",
+    "party": "中國國民黨",
+    "look": "lienchiang-1-look.webp",
+    "poster": "lienchiang-1-poster.webp"
+  },
+  {
+    "county": "連江縣",
+    "county_id": "lienchiang",
+    "number": 2,
+    "name": "曹爾元",
+    "party": "無黨籍",
+    "look": "lienchiang-2-look.webp",
+    "poster": "lienchiang-2-poster.webp"
+  }
+]
