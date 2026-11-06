@@ -188,6 +188,8 @@ footer{border-top:3px solid var(--ink);margin-top:24px;background:var(--paper-2)
 footer .wrap{padding-block:22px 28px;display:grid;gap:10px;font-size:14px;color:var(--ink-soft)}
 footer strong{color:var(--ink)}
 footer p{margin:0;max-width:60em}
+footer .recaptcha-note{font-size:12px}
+.grecaptcha-badge{visibility:hidden}
 .big-foot{font-family:var(--display);font-weight:900;font-size:22px;color:var(--stamp)}
 
 .gate{position:fixed;inset:0;z-index:20;background:rgba(22,20,15,.72);display:grid;place-items:center;
@@ -224,6 +226,7 @@ footer p{margin:0;max-width:60em}
     <p>致敬並反轉自 <a href="https://blindvote.app" target="_blank" rel="noopener">留白投票所 blindvote.app</a>：他們遮名字只看政見，我們遮政見只看門面。要認真比較政見，請去那裡，或看中選會的選舉公報。</p>
     <p>本站不支持、不反對任何候選人或政黨。號次與黨籍依中選會號次抽籤結果（2026-10-27）；口號整理自候選人公開活動與新聞報導，標註「抽籤喊話」「競選主軸」者不一定是正式口號，若有錯誤以候選人官方為準。口號裡出現候選人名字中兩個以上的字才會遮住，只有一個字照原文。外表與競選照兩輪是插畫重繪，不是候選人官方文宣；頭像為統一卡通臉，不代表候選人本人長相。</p>
     <p>資料整理：2026-11-06。</p>
+    <p class="recaptcha-note">投票統計用 reCAPTCHA 擋機器人，適用 Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隱私權政策</a>與<a href="https://policies.google.com/terms" target="_blank" rel="noopener">服務條款</a>。</p>
   </div>
 </footer>
 
@@ -246,6 +249,25 @@ if(GA_ON){
   gtag("js", new Date());
   gtag("config", GA_ID, { send_page_view:false });
   const s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID; document.head.appendChild(s);
+}
+/* ===== reCAPTCHA v3（隱形，沒有勾選框）：只在正式站載入，開票送統計時取 token，Worker 驗證分數 =====
+   site key 是公開的；secret 在 Worker（wrangler secret put RECAPTCHA_SECRET）。右下角徽章用 CSS 藏起來，頁尾有 Google 規定的說明文字。 */
+const RECAPTCHA_SITE_KEY = "6Leb6hIuAAAAAEHIeRNKcT22OhPJSjxhdkFdVJay";
+const RECAPTCHA_ON = GA_ON && !!RECAPTCHA_SITE_KEY;
+if(RECAPTCHA_ON){
+  const s = document.createElement("script"); s.async = true; s.src = "https://www.google.com/recaptcha/api.js?render=" + encodeURIComponent(RECAPTCHA_SITE_KEY); document.head.appendChild(s);
+}
+/* 取不到（擋廣告外掛、載入失敗、逾時）就回 ""，Worker 會拒收這票，但不影響遊戲和讀統計 */
+function recaptchaToken(action){
+  if(!RECAPTCHA_ON) return Promise.resolve("");
+  return new Promise(resolve=>{
+    const timer = setTimeout(()=>resolve(""), 5000);
+    const done = t=>{ clearTimeout(timer); resolve(t||""); };
+    const run = ()=>{ try{ grecaptcha.ready(()=>grecaptcha.execute(RECAPTCHA_SITE_KEY,{action}).then(done,()=>done(""))); }catch(e){ done(""); } };
+    if(window.grecaptcha && grecaptcha.ready) return run();
+    let tries = 0;
+    const wait = setInterval(()=>{ if(window.grecaptcha && grecaptcha.ready){ clearInterval(wait); run(); } else if(++tries>45){ clearInterval(wait); done(""); } }, 100);
+  });
 }
 function track(name, params){ try{ if(GA_ON && window.gtag) gtag("event", name, params||{}); }catch(e){} }
 function pageView(){ track("page_view", { page_title:document.title, page_location:location.href, page_path:location.pathname }); }
@@ -594,6 +616,7 @@ async function crowd(d, rounds, picks){
   rounds.forEach(r=>{ body.picks[r.key] = picks[r.key] ?? null; });
   let st;
   try{
+    body.token = await recaptchaToken("vote");
     await fetch(API+"vote",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body),keepalive:true});
     const res = await fetch(API+"stats?county="+encodeURIComponent(d.id),{cache:"no-store"});
     if(!res.ok) return;

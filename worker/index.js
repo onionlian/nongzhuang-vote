@@ -7,6 +7,10 @@
 // 選罷法第 53 條：投票日前十日起至投票時間截止前不得發布民調。
 // BLACKOUT 期間 stats 只回局數；要看完整數字請直接查 D1（見 README）。
 // 每個 IP 每小時最多 VOTES_PER_HOUR 局（IP 用每日換鹽的雜湊，不存原始 IP，兩天後刪）。
+//
+// reCAPTCHA v3：有設 Worker secret RECAPTCHA_SECRET 時，vote 一定要帶 token（body.token），
+// 向 Google 驗證 success、action=vote、hostname 是 onininon.com、分數 >= RECAPTCHA_MIN_SCORE，不通過就不寫入。
+// 沒設 secret 就不驗（本機、還沒申請金鑰時）。設定：npx wrangler secret put RECAPTCHA_SECRET
 
 const BASE = '/nongzhuang-vote/api/';
 const BLACKOUT_FROM = Date.parse('2026-11-18T00:00:00+08:00');
@@ -20,6 +24,8 @@ const COUNTIES = {
   penghu: 6, kinmen: 7, lienchiang: 2,
 };
 const VOTES_PER_HOUR = 30;
+const RECAPTCHA_MIN_SCORE = 0.5;
+const RECAPTCHA_HOST = /^(www\.)?onininon\.com$/;
 
 const SCHEMA = [
   'CREATE TABLE IF NOT EXISTS tally (county TEXT NOT NULL, round TEXT NOT NULL, n INTEGER NOT NULL, votes INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (county, round, n))',
@@ -45,6 +51,27 @@ async function whoHash(req) {
   return [...new Uint8Array(buf)].slice(0, 12).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+// 回傳 null 表示通過，否則是拒絕原因
+async function checkRecaptcha(token, req, env) {
+  if (!env.RECAPTCHA_SECRET) return null;
+  if (typeof token !== 'string' || !token || token.length > 4000) return 'recaptcha-missing';
+  const form = new URLSearchParams({ secret: env.RECAPTCHA_SECRET, response: token });
+  const ip = req.headers.get('cf-connecting-ip');
+  if (ip) form.set('remoteip', ip);
+  let r;
+  try {
+    const res = await fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'POST', body: form });
+    r = await res.json();
+  } catch (e) {
+    console.error('recaptcha verify', e);
+    return 'recaptcha-unavailable';
+  }
+  if (!r.success) return 'recaptcha-invalid';
+  if (r.action !== 'vote' || !RECAPTCHA_HOST.test(r.hostname || '')) return 'recaptcha-mismatch';
+  if (!(r.score >= RECAPTCHA_MIN_SCORE)) return 'recaptcha-score';
+  return null;
+}
+
 async function vote(req, env) {
   // 只收同站送出的 JSON
   const origin = req.headers.get('origin');
@@ -54,6 +81,9 @@ async function vote(req, env) {
   const county = String(body?.county || '');
   const max = COUNTIES[county];
   if (!max) return json({ error: 'county' }, 400);
+
+  const bad = await checkRecaptcha(body?.token, req, env);
+  if (bad) return json({ ok: false, error: bad }, bad === 'recaptcha-unavailable' ? 503 : 403);
 
   const who = await whoHash(req);
   const hour = Math.floor(Date.now() / 3600000);
