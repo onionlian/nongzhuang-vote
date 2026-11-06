@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>濃妝投票所</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="惡搞專用：分四輪只看政黨、口號、外表、競選照，不看名字也不看政見。投票請認真看政見。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@700;900&display=swap">
+<style>
+/* Layout: 選舉看板牆。紙白底、印刷黑、圈選章紅；四輪各自一面牆，最後開票 */
+:root{
+  color-scheme: light;
+  --paper:#f7f5ef;
+  --paper-2:#ece8dc;
+  --ink:#16140f;
+  --ink-soft:#5b5649;
+  --stamp:#c8102e;
+  --warn:#ffd400;
+  --display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--warn)}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--stamp);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.marquee{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--warn);color:var(--ink);
+  border-bottom:3px solid var(--ink);overflow:hidden;white-space:nowrap;font-weight:900;font-size:14px;letter-spacing:.06em}
+.marquee__track{display:inline-block;padding-block:7px;animation:run 38s linear infinite}
+.marquee__track span{padding-inline:22px}
+@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.hero{padding-block:36px 8px;display:grid;gap:14px}
+.eyebrow{font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--ink-soft)}
+.hero h1{font-family:var(--display);font-weight:900;font-size:clamp(48px,12vw,104px);line-height:1;margin:0;letter-spacing:.02em}
+.hero h1 em{font-style:normal;color:var(--paper);background:var(--ink);padding:0 .12em;border-radius:4px}
+.lede{font-size:clamp(18px,3.4vw,24px);font-weight:700;margin:0;text-wrap:balance;max-width:28em}
+.lede s{text-decoration-thickness:3px;text-decoration-color:var(--stamp)}
+.sub{color:var(--ink-soft);margin:0;max-width:38em}
+
+.disclaimer{border:3px solid var(--ink);background:#fff;padding:16px 18px;display:grid;gap:8px;margin-block:20px;position:relative}
+.disclaimer strong{color:var(--stamp)}
+.disclaimer p{margin:0}
+.disclaimer__tag{position:absolute;top:-13px;left:14px;background:var(--stamp);color:#fff;font-weight:900;font-size:13px;padding:2px 10px;letter-spacing:.1em}
+
+.steps{list-style:none;margin:8px 0 28px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.steps li{border-top:3px solid var(--ink);padding-top:10px}
+.steps b{display:block;font-size:16px;font-weight:900}
+.steps span{color:var(--ink-soft);font-size:15px}
+.steps i{font-style:normal;color:var(--stamp);font-family:var(--display);font-weight:900;margin-right:6px}
+
+.section-title{font-family:var(--display);font-weight:900;font-size:28px;margin:8px 0 4px}
+.section-note{margin:0 0 14px;color:var(--ink-soft)}
+.counties{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;padding-bottom:28px}
+.county{background:#fff;border:2px solid var(--ink);padding:12px 12px 10px;text-align:left;display:grid;gap:2px;border-radius:2px;transition:transform .12s, box-shadow .12s}
+.county:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.county b{font-size:20px;font-weight:900}
+.county small{color:var(--ink-soft);font-size:13px}
+
+/* 回合 */
+.game{padding-block:20px 8px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-content:space-between}
+.back{background:none;border:2px solid var(--ink);padding:6px 12px;font-weight:700}
+.progress{display:flex;gap:6px;list-style:none;margin:14px 0 0;padding:0;flex-wrap:wrap}
+.progress li{font-size:13px;font-weight:700;padding:3px 10px;border:2px solid var(--ink);background:#fff;color:var(--ink-soft)}
+.progress li.now{background:var(--ink);color:var(--paper)}
+.progress li.done{background:var(--paper-2);color:var(--ink)}
+.progress li.done::after{content:" ✓"}
+.game h2{font-family:var(--display);font-weight:900;font-size:clamp(30px,6vw,48px);margin:10px 0 2px;line-height:1.15;text-wrap:balance}
+.game .instr{margin:0 0 6px;font-weight:700}
+.game .instr span{color:var(--stamp)}
+.mini-warn{font-size:13px;color:var(--ink-soft);margin:0 0 16px}
+
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;padding-bottom:20px}
+.opt{position:relative;border:3px solid var(--ink);border-radius:3px;text-align:left;padding:0;overflow:hidden;min-width:0;
+  display:grid;grid-template-rows:1fr auto;background:#fff;transition:transform .15s,box-shadow .15s}
+.opt:hover{transform:translateY(-3px);box-shadow:0 6px 0 var(--ink)}
+.opt.is-picked{box-shadow:0 0 0 5px var(--stamp)}
+.letter{position:absolute;top:10px;left:10px;z-index:4;width:40px;height:40px;border-radius:50%;background:var(--paper);color:var(--ink);
+  border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:22px}
+.opt__foot{background:var(--paper);color:var(--ink);border-top:3px solid var(--ink);padding:8px 12px;display:grid;gap:2px;font-size:13px}
+.redact{font-weight:700}
+.redact span{background:var(--ink);color:var(--ink);padding:0 4px;letter-spacing:-.1em;user-select:none}
+.foot-warn{color:var(--stamp);font-weight:900}
+
+/* 第一輪：政黨 */
+.flag{--pc:#777;--pt:#fff;background:var(--pc);color:var(--pt);min-height:190px;display:grid;place-items:center;padding:58px 16px 22px;text-align:center;
+  background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.08) 0 14px,transparent 14px 28px)}
+.flag b{font-family:var(--display);font-weight:900;font-size:clamp(26px,6vw,34px);line-height:1.2;text-wrap:balance}
+/* 第二輪：口號 */
+.banner{background:#fff;min-height:190px;display:grid;align-content:center;gap:8px;padding:60px 18px 22px;
+  background-image:linear-gradient(var(--paper-2),var(--paper-2));background-size:100% 10px;background-repeat:no-repeat;background-position:bottom}
+.banner q{font-family:var(--display);font-weight:900;font-size:clamp(24px,5.4vw,30px);line-height:1.25;quotes:"「" "」";text-wrap:balance}
+.banner small{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em}
+/* 第三、四輪：圖 */
+.art{display:block;width:100%;height:auto;aspect-ratio:3/4;max-width:100%;background:var(--paper-2)}
+.photo{position:relative;aspect-ratio:3/4;max-width:100%;overflow:hidden;background:var(--paper-2)}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo .mask{position:absolute;background:var(--ink);display:grid;place-items:center;color:#fff;font-weight:900;font-size:12px;transform:rotate(-3deg)}
+
+.cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-bottom:28px}
+.btn{border:3px solid var(--ink);background:var(--ink);color:var(--paper);font-weight:900;font-size:18px;padding:12px 20px;border-radius:2px}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn--ghost{background:#fff;color:var(--ink)}
+.skip{background:none;border:none;text-decoration:underline;color:var(--ink-soft);font-weight:700;padding:8px}
+
+.stamp{position:absolute;z-index:5;right:12px;top:12px;width:92px;height:92px;border:5px solid var(--stamp);border-radius:50%;
+  color:var(--stamp);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:42px;background:rgba(255,255,255,.72);
+  transform:rotate(-14deg);pointer-events:none}
+.stamp::after{content:"";position:absolute;inset:6px;border:2px solid var(--stamp);border-radius:50%}
+.stamp.pop{animation:stampin .28s cubic-bezier(.2,1.6,.4,1)}
+@keyframes stampin{from{transform:rotate(-14deg) scale(2.4);opacity:0}to{transform:rotate(-14deg) scale(1);opacity:1}}
+
+/* 開票 */
+.reveal{padding-block:24px 8px;display:grid;gap:18px}
+.reveal__head{font-family:var(--display);font-weight:900;font-size:clamp(28px,6vw,46px);margin:0;line-height:1.15;text-wrap:balance}
+.verdict{font-size:clamp(18px,3.4vw,22px);font-weight:700;margin:0;max-width:34em}
+.rounds-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.rs{border:3px solid var(--ink);background:#fff;padding:10px 12px;display:grid;gap:2px;min-width:0}
+.rs small{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em}
+.rs b{font-size:18px;font-weight:900;word-break:break-all}
+.rs span{font-size:13px;color:var(--ink-soft)}
+.score{display:grid;gap:8px}
+.srow{display:grid;grid-template-columns:minmax(0,7em) 1fr 3.5em;gap:10px;align-items:center}
+.srow .nm{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srow .track{height:18px;background:var(--paper-2);border:2px solid var(--ink);position:relative}
+.srow .fill{position:absolute;inset:0 auto 0 0;background:var(--stamp)}
+.srow .pct{font-variant-numeric:tabular-nums;font-weight:900;text-align:right}
+.crowd{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.crowd-round{display:grid;gap:6px;border-top:3px solid var(--ink);padding-top:8px;min-width:0}
+.crowd-round small{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em}
+.srow.mine .nm{text-decoration:underline;text-decoration-color:var(--stamp);text-decoration-thickness:3px}
+.serious{background:var(--ink);color:var(--paper);padding:22px 20px;display:grid;gap:12px;border-radius:2px}
+.serious h3{font-family:var(--display);font-weight:900;font-size:clamp(24px,5vw,34px);margin:0;line-height:1.2;color:var(--warn)}
+.serious p{margin:0;max-width:40em}
+.serious .links{display:flex;flex-wrap:wrap;gap:10px}
+.serious a{background:var(--warn);color:var(--ink);font-weight:900;text-decoration:none;padding:10px 14px;border:2px solid var(--warn)}
+.serious a.alt{background:transparent;color:var(--paper);border-color:var(--paper)}
+.result{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.rcard{border:3px solid var(--ink);background:#fff;display:grid;grid-template-columns:auto 1fr;gap:10px 12px;padding:12px;align-items:start;min-width:0}
+.rnum{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:28px;border:3px solid var(--ink)}
+.rcard h4{margin:0;font-size:20px;font-weight:900;line-height:1.3;word-break:break-all}
+.rcard p{margin:0;font-size:14px;color:var(--ink-soft);min-width:0}
+.rcard .rslogan{color:var(--ink);font-weight:700}
+.rcard .rbody{display:grid;gap:4px;min-width:0}
+.again{display:flex;flex-wrap:wrap;gap:10px}
+
+footer{border-top:3px solid var(--ink);margin-top:24px;background:var(--paper-2)}
+footer .wrap{padding-block:22px 28px;display:grid;gap:10px;font-size:14px;color:var(--ink-soft)}
+footer strong{color:var(--ink)}
+footer p{margin:0;max-width:60em}
+.big-foot{font-family:var(--display);font-weight:900;font-size:22px;color:var(--stamp)}
+
+.gate{position:fixed;inset:0;z-index:20;background:rgba(22,20,15,.72);display:grid;place-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-bottom,0px))}
+.gate__box{background:var(--paper);border:4px solid var(--ink);max-width:440px;width:100%;padding:22px;display:grid;gap:12px;box-shadow:8px 8px 0 var(--stamp)}
+.gate__box h2{font-family:var(--display);font-weight:900;margin:0;font-size:28px;line-height:1.2}
+.gate__box p{margin:0}
+.gate__box label{display:flex;gap:10px;align-items:flex-start;font-weight:700;cursor:pointer}
+.gate__box input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--stamp)}
+
+@media (max-width:420px){ .stamp{width:76px;height:76px;font-size:34px} }
+@media (prefers-reduced-motion:reduce){
+  .marquee__track{animation:none} .stamp.pop{animation:none} .opt,.county{transition:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="marquee" aria-label="惡搞警語">
+  <div class="marquee__track" aria-hidden="true">
+    <span>⚠ 本站純屬惡搞</span><span>投票請認真看政見</span><span>看臉投票不是好公民</span><span>11/28 投票前請讀選舉公報</span><span>口號不會幫你修路</span><span>政黨色不是政見</span>
+    <span>⚠ 本站純屬惡搞</span><span>投票請認真看政見</span><span>看臉投票不是好公民</span><span>11/28 投票前請讀選舉公報</span><span>口號不會幫你修路</span><span>政黨色不是政見</span>
+  </div>
+  <span class="sr">本站純屬惡搞，投票請認真看政見。</span>
+</div>
+
+<main id="app"></main>
+
+<footer>
+  <div class="wrap">
+    <p class="big-foot">再說一次：這是惡搞網站。</p>
+    <p><strong>真正的民主國家好公民，投票前會看政見。</strong>本站故意只給你看政黨、口號、外表和競選照，是為了讓你發現這樣選有多荒謬，不是教你這樣選。</p>
+    <p>致敬並反轉自 <a href="https://blindvote.app" target="_blank" rel="noopener">留白投票所 blindvote.app</a>：他們遮名字只看政見，我們遮政見只看門面。要認真比較政見，請去那裡，或看中選會的選舉公報。</p>
+    <p>本站不支持、不反對任何候選人或政黨。號次與黨籍依中選會號次抽籤結果（2026-10-27）；口號整理自候選人公開活動與新聞報導，標註「抽籤喊話」「競選主軸」者不一定是正式口號，若有錯誤以候選人官方為準。口號裡出現候選人名字中兩個以上的字才會遮住，只有一個字照原文。外表與競選照兩輪是本站原創插畫，與候選人本人及官方文宣無關。</p>
+    <p>資料整理：2026-11-06。</p>
+  </div>
+</footer>
+
+<div class="gate" id="gate" hidden>
+  <div class="gate__box" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <h2 id="gateTitle">進場前先確認</h2>
+    <p>這是<strong>惡搞網站</strong>。我們會把名字和政見全部塗黑，只讓你看政黨、口號、外表跟競選照。</p>
+    <p>真的要投票時，請看政見、看選舉公報。這才是民主國家的好公民。</p>
+    <button class="btn" id="gateBtn">我知道這是惡搞，投票我會認真看政見</button>
+  </div>
+</div>
+
+<script>
+const PARTY = {
+  "中國國民黨": {c:"#1a3f9c", t:"#fff"},
+  "民主進步黨": {c:"#1f8a3c", t:"#fff"},
+  "台灣民眾黨": {c:"#24a8ad", t:"#fff"},
+  "無黨籍":     {c:"#6e6a60", t:"#fff"},
+  "台灣麻將最大黨": {c:"#b5321f", t:"#fff"},
+  "臺灣SoR無法黨": {c:"#3b2a5c", t:"#fff"},
+  "三勢團結促進聯盟": {c:"#8a5a12", t:"#fff"},
+  "司法正義黨": {c:"#4a4a7a", t:"#fff"},
+  "司法改革黨": {c:"#5c3a6e", t:"#fff"},
+  "台灣工黨":   {c:"#b8451f", t:"#fff"},
+  "台灣團結聯盟": {c:"#7a4a1e", t:"#fff"}
+};
+/* s = 遮名版口號，full = 原文；kind: 口號 | 主軸 | 喊話
+   photo：可填你有權使用的圖片網址（放在自己網域才會顯示）；mask：[左%,上%,寬%,高%] 頭部遮罩位置 */
+/* 口號含候選人名字中 2 個以上的字就遮住那些字；只有 1 個字則照原文 */
+const maskName=(text,name)=>{ if(!text) return ""; const hit=[...new Set([...name])].filter(ch=>text.includes(ch)); return hit.length>=2 ? [...text].map(ch=>hit.includes(ch)?"▇":ch).join("") : text; };
+const N = (n,name,party,s,kind,full)=>({n,name,party,s:maskName(full||s||"",name),kind:kind||"",full:full||s||"",photo:"",mask:[30,6,40,30]});
+const DATA = [
+ {id:"taipei",name:"台北市",cand:[
+   N(1,"郭璽","台灣麻將最大黨"), N(2,"林志成","無黨籍"),
+   N(3,"沈伯洋","民主進步黨","台北靠3","口號"), N(4,"蕭文乾","臺灣SoR無法黨"),
+   N(5,"蔣萬安","中國國民黨","台北▇可","口號","台北安可"), N(6,"唐新民","三勢團結促進聯盟")]},
+ {id:"newtaipei",name:"新北市",cand:[
+   N(1,"蘇巧慧","民主進步黨","新世代，扛起新時代","口號"), N(2,"蘇輝湟","無黨籍"),
+   N(3,"李四川","中國國民黨","讓我當你的靠山","主軸")]},
+ {id:"taoyuan",name:"桃園市",cand:[
+   N(1,"黃世杰","民主進步黨","桃園動起來","口號"),
+   N(2,"張善政","中國國民黨","桃園前進、繼續挺▇良","口號","桃園前進、繼續挺善良")]},
+ {id:"taichung",name:"台中市",cand:[
+   N(1,"何欣純","民主進步黨","讓台中更好","主軸"), N(2,"洪麗華","司法正義黨"),
+   N(3,"江啟臣","中國國民黨","市民靠山","主軸")]},
+ {id:"tainan",name:"台南市",cand:[
+   N(1,"蕭燐洪","臺灣SoR無法黨"), N(2,"謝龍介","中國國民黨","翻轉大台南，人民贏一次","口號"),
+   N(3,"陳亭妃","民主進步黨"), N(4,"葉人文","無黨籍")]},
+ {id:"kaohsiung",name:"高雄市",cand:[
+   N(1,"張靜","司法改革黨"), N(2,"王肇民","無黨籍"),
+   N(3,"柯志恩","中國國民黨","這▇不一樣","口號","這柯不一樣"), N(4,"洪方隆","無黨籍"),
+   N(5,"賴瑞隆","民主進步黨","南方崛起，邁向國際","口號")]},
+ {id:"keelung",name:"基隆市",cand:[
+   N(1,"童子瑋","民主進步黨","生活市長","主軸"), N(2,"魏造文","無黨籍"),
+   N(3,"謝國樑","中國國民黨","亞洲最有愛的城市","主軸")]},
+ {id:"hsinchucity",name:"新竹市",cand:[
+   N(1,"高虹安","無黨籍"), N(2,"何志勇","無黨籍"), N(3,"莊競程","民主進步黨","幸福新製程","主軸")]},
+ {id:"hsinchucounty",name:"新竹縣",cand:[
+   N(1,"鄭朝方","民主進步黨","政績超越政黨","主軸"), N(2,"徐欣瑩","中國國民黨","為新竹創新局","主軸"),
+   N(3,"朱定瑀","無黨籍")]},
+ {id:"miaoli",name:"苗栗縣",cand:[ N(1,"陳品安","民主進步黨"), N(2,"鍾東錦","中國國民黨")]},
+ {id:"changhua",name:"彰化縣",cand:[
+   N(1,"陳素月","民主進步黨"), N(2,"魏平政","中國國民黨","彰化贏，台灣就贏","喊話"),
+   N(3,"邱建富","無黨籍"), N(4,"陳重嘉","無黨籍")]},
+ {id:"nantou",name:"南投縣",cand:[
+   N(1,"許淑華","中國國民黨","一定連任","喊話"), N(2,"温世政","民主進步黨","顧老人、顧少年、顧腹肚","口號")]},
+ {id:"yunlin",name:"雲林縣",cand:[
+   N(1,"吳炳輝","無黨籍"), N(2,"張嘉郡","中國國民黨","WOW","主軸"),
+   N(3,"劉建國","民主進步黨","雲林三愛、教育有愛","口號"), N(4,"林佳瑜","無黨籍")]},
+ {id:"chiayicity",name:"嘉義市",cand:[
+   N(1,"王義成","無黨籍"), N(2,"陳愷璜","無黨籍","美學結合科技","主軸"),
+   N(3,"張啓楷","台灣民眾黨","嘉義起風了","喊話"), N(4,"王美惠","民主進步黨","與市民同行","喊話"),
+   N(5,"黃宏成台灣阿成世界偉人財神總統","無黨籍")]},
+ {id:"chiayicounty",name:"嘉義縣",cand:[ N(1,"吳品叡","無黨籍"), N(2,"蔡易餘","民主進步黨","嘉義黃金10年","主軸")]},
+ {id:"pingtung",name:"屏東縣",cand:[ N(1,"蘇清泉","中國國民黨","一馬當先","喊話"), N(2,"周春米","民主進步黨","勝利連任","喊話")]},
+ {id:"yilan",name:"宜蘭縣",cand:[
+   N(1,"林國漳","民主進步黨","一馬當先，宜蘭一定贏","喊話"), N(2,"陳宏毅","無黨籍"),
+   N(3,"吳宗憲","中國國民黨","縣長選▇▇，宜蘭有靠山","喊話","縣長選宗憲，宜蘭有靠山"),
+   N(4,"劉燦輝","無黨籍"), N(5,"楊鉯婷","無黨籍")]},
+ {id:"hualien",name:"花蓮縣",cand:[
+   N(1,"魏嘉賢","無黨籍","大步向前","喊話"), N(2,"張峻","無黨籍","好事成雙","喊話"),
+   N(3,"游淑貞","中國國民黨","三陽開泰、萬事OK","喊話"), N(4,"羅佩秦","台灣工黨")]},
+ {id:"taitung",name:"台東縣",cand:[
+   N(1,"李吳穎智","無黨籍"), N(2,"陳瑩","民主進步黨","台東，世界的入口","主軸"),
+   N(3,"王志偉","無黨籍"), N(4,"吳秀華","中國國民黨","事事如意、四方來相聚","口號")]},
+ {id:"penghu",name:"澎湖縣",cand:[
+   N(1,"許智富","無黨籍"), N(2,"周倪安","台灣團結聯盟"), N(3,"葉竹林","無黨籍"),
+   N(4,"吳淑瑾","民主進步黨"), N(5,"陳振中","中國國民黨"), N(6,"陳盡川","無黨籍")]},
+ {id:"kinmen",name:"金門縣",cand:[
+   N(1,"張國威","無黨籍","▇風吹起，金門有望","口號","微風吹起，金門有望"),
+   N(2,"李文良","無黨籍","▇政啟航，金門優先","口號","良政啟航，金門優先"),
+   N(3,"洪和成","無黨籍"), N(4,"張火木","無黨籍"),
+   N(5,"陳玉珍","中國國民黨","▇愛金門","口號","珍愛金門"),
+   N(6,"梁文韜","無黨籍","三不要、十大願景","主軸"), N(7,"黃世團","無黨籍")]},
+ {id:"lienchiang",name:"連江縣",cand:[ N(1,"王忠銘","中國國民黨","一起走對的路","喊話"), N(2,"曹爾元","無黨籍")]}
+];
+const KIND_LABEL = {"口號":"競選口號","主軸":"競選主軸","喊話":"抽籤喊話"};
+const ROUNDS = [
+  {key:"party",  tab:"政黨",   title:"第一輪：政黨",   ask:"只看政黨，哪一個最順眼？", warn:"政黨不等於政見。同一個黨的縣市長，政見也可能差很多。"},
+  {key:"slogan", tab:"口號",   title:"第二輪：口號",   ask:"只看口號，哪一句最打動你？", warn:"口號越短越好記，但它不會告訴你錢從哪裡來。"},
+  {key:"look",   tab:"外表",   title:"第三輪：外表",   ask:"只看穿著和姿勢，哪一位最有市長樣？", warn:"這些是本站原創插畫，不是候選人本人。而且外表本來就不該影響你的一票。"},
+  {key:"poster", tab:"競選照", title:"第四輪：競選照", ask:"只看整張看板，哪一張最想讓它掛在你家巷口？", warn:"看板設計得好，代表廣告公司很厲害，不代表市政會做得好。"}
+];
+const VERDICTS = [
+  "四輪選完，你連一條政見都沒看過。",
+  "你用顏色、句子、衣服和看板，選出了一位縣市長。",
+  "如果這是真的選票，你剛剛把四年交給一家廣告公司。",
+  "恭喜，你完成了最不推薦的投票方式。",
+  "門面很重要嗎？在這個網站很重要。在真實世界，請看政見。"
+];
+
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pc = p => PARTY[p] || PARTY["無黨籍"];
+const LETTERS = "ABCDEFG";
+function hash(str){let h=2166136261;for(const ch of str){h^=ch.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let s=seed||1;return()=>{s^=s<<13;s^=s>>>17;s^=s<<5;return((s>>>0)%10000)/10000}}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+/* ===== 原創插畫：無臉人物 ===== */
+const SKIN=["#f1c9a5","#e2b08a","#c98e64","#a86f4c"];
+const OUTFIT=[
+  {suit:"#22252b",shirt:"#ffffff"},{suit:"#ffffff",shirt:"#ffffff"},{suit:"#2b3a55",shirt:"#e8eef7"},
+  {suit:"#f2efe7",shirt:"#ffffff"},{suit:"#4a3b2f",shirt:"#fff7e8"}
+];
+function figure(c, d, r, scale){
+  const p=pc(c.party);
+  const skin=SKIN[Math.floor(r()*SKIN.length)];
+  const o=OUTFIT[Math.floor(r()*OUTFIT.length)];
+  const vestParty = r()>.45; /* 競選背心或彩帶用政黨色 */
+  const pose=Math.floor(r()*6);
+  const hair=["#1b1a18","#2e2620","#4a4038","#8a8580"][Math.floor(r()*4)];
+  const sw=24;
+  const arms={
+    0:`M112,168 L84,118 L74,70`+`|M188,168 L216,118 L226,70`,                /* 雙手高舉 */
+    1:`M112,168 L96,220 L100,262`+`|M188,168 L226,130 L246,84`,              /* 揮手 */
+    2:`M112,168 L104,214 L140,206`+`|M188,168 L196,214 L160,206`,            /* 雙手抱胸 */
+    3:`M112,168 L98,222 L104,264`+`|M188,168 L214,206 L246,196`,             /* 比讚 */
+    4:`M112,168 L96,222 L100,264`+`|M188,168 L232,150 L268,132`,             /* 指向遠方 */
+    5:`M112,168 L90,120 L104,82`+`|M188,168 L210,120 L196,82`                /* 雙手握拳胸前 */
+  }[pose].split("|");
+  const hands=arms.map(a=>{const pts=a.match(/-?\d+,-?\d+/g);const [x,y]=pts[pts.length-1].split(",");return `<circle cx="${x}" cy="${y}" r="13" fill="${skin}"/>`}).join("");
+  const thumb = pose===3?`<rect x="240" y="176" width="9" height="20" rx="4" fill="${skin}"/>`:"";
+  const sash = vestParty
+    ? `<path d="M118,160 L188,300 L210,300 L140,156 Z" fill="${p.c}" opacity=".95"/>`
+    : `<path d="M150,172 L143,186 L150,236 L157,186 Z" fill="${p.c}"/>`;
+  return `<g transform="translate(${150-150*scale},${(1-scale)*300}) scale(${scale})">
+    ${arms.map(a=>`<path d="${a}" fill="none" stroke="${o.suit}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`).join("")}
+    ${hands}${thumb}
+    <path d="M96,300 Q96,170 150,160 Q204,170 204,300 Z" fill="${o.suit}" stroke="rgba(0,0,0,.18)" stroke-width="2"/>
+    <path d="M132,162 L150,200 L168,162 Z" fill="${o.shirt}"/>
+    ${sash}
+    <rect x="138" y="132" width="24" height="30" fill="${skin}"/>
+    <ellipse cx="150" cy="104" rx="36" ry="42" fill="${skin}"/>
+    <path d="M114,96 Q118,58 150,58 Q184,58 186,96 Q170,80 150,82 Q128,82 114,96 Z" fill="${hair}"/>
+    <g transform="rotate(-4 150 104)">
+      <rect x="104" y="72" width="92" height="68" fill="#16140f"/>
+      <text x="150" y="112" text-anchor="middle" font-size="15" font-weight="900" fill="#fff" font-family="Noto Sans TC, sans-serif">頭部已遮</text>
+    </g>
+  </g>`;
+}
+function lookArt(c, d){
+  const r=rng(hash(d.id+c.n+"look"));
+  return `<svg class="art" viewBox="0 0 300 400" role="img" aria-label="原創插畫：無臉人物">
+    <rect width="300" height="400" fill="#e9e5da"/>
+    <rect y="300" width="300" height="100" fill="#d9d3c4"/>
+    <g transform="translate(0,40)">${figure(c,d,r,1)}</g>
+  </svg>`;
+}
+function posterArt(c, d){
+  const r=rng(hash(d.id+c.n+"poster"));
+  const p=pc(c.party);
+  const style=Math.floor(r()*4);
+  let bg="";
+  if(style===0){ /* 放射光芒 */
+    let rays="";for(let i=0;i<24;i++){const a=i*15*Math.PI/180,b=(i*15+7)*Math.PI/180;rays+=`<path d="M150,250 L${150+400*Math.cos(a)},${250+400*Math.sin(a)} L${150+400*Math.cos(b)},${250+400*Math.sin(b)} Z" fill="#fff" opacity=".14"/>`}
+    bg=`<rect width="300" height="400" fill="${p.c}"/>${rays}`;
+  }else if(style===1){ /* 斜條紋 */
+    bg=`<rect width="300" height="400" fill="${p.c}"/>`+Array.from({length:14},(_,i)=>`<path d="M${i*44-200},400 L${i*44},0 L${i*44+20},0 L${i*44-180},400 Z" fill="#fff" opacity=".1"/>`).join("");
+  }else if(style===2){ /* 城市天際線 */
+    let sky="";let x=0;while(x<300){const w=18+Math.floor(r()*30),h=60+Math.floor(r()*120);sky+=`<rect x="${x}" y="${300-h}" width="${w}" height="${h}" fill="#000" opacity=".18"/>`;x+=w+4}
+    bg=`<rect width="300" height="400" fill="${p.c}"/><circle cx="230" cy="90" r="46" fill="#fff" opacity=".22"/>${sky}`;
+  }else{ /* 大圓點 */
+    bg=`<rect width="300" height="400" fill="${p.c}"/>`+Array.from({length:18},()=>`<circle cx="${Math.floor(r()*300)}" cy="${Math.floor(r()*300)}" r="${8+Math.floor(r()*26)}" fill="#fff" opacity=".12"/>`).join("");
+  }
+  const layout=Math.floor(r()*3);
+  const bandY = layout===0?318:layout===1?20:300;
+  const figY = layout===1?92:56;
+  const word = ["凍蒜","拜託","衝衝衝","做伙拚","一定贏"][Math.floor(r()*5)];
+  const text = layout===1
+    ? `<rect x="0" y="${bandY}" width="300" height="62" fill="#fff"/><text x="150" y="${bandY+43}" text-anchor="middle" font-size="34" font-weight="900" fill="${p.c}" font-family="Noto Serif TC, serif">▇▇▇</text>`
+    : `<rect x="0" y="${bandY}" width="300" height="${400-bandY}" fill="#fff"/><text x="22" y="${bandY+46}" font-size="36" font-weight="900" fill="${p.c}" font-family="Noto Serif TC, serif">▇▇▇</text><text x="22" y="${bandY+76}" font-size="15" font-weight="700" fill="#16140f" font-family="Noto Sans TC, sans-serif">（名字和口號都遮掉了）</text>`;
+  const sticker = `<g transform="rotate(12 238 ${layout===1?352:66})"><rect x="196" y="${layout===1?332:46}" width="86" height="40" rx="4" fill="#ffd400" stroke="#16140f" stroke-width="3"/><text x="239" y="${layout===1?359:73}" text-anchor="middle" font-size="19" font-weight="900" fill="#16140f" font-family="Noto Sans TC, sans-serif">${word}</text></g>`;
+  return `<svg class="art" viewBox="0 0 300 400" role="img" aria-label="原創插畫：競選看板">
+    ${bg}<g transform="translate(0,${figY})">${figure(c,d,r,.84)}</g>${text}${sticker}
+    <rect x="1.5" y="1.5" width="297" height="397" fill="none" stroke="#16140f" stroke-width="3"/>
+  </svg>`;
+}
+function photoBox(c){
+  const [x,y,w,h]=c.mask;
+  return `<div class="photo"><img src="${esc(c.photo)}" alt="" onerror="this.parentNode.remove()"><div class="mask" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%">頭部已遮</div></div>`;
+}
+
+/* ===== 頁面 ===== */
+let state=null;
+
+function home(){
+  state=null;
+  document.title="濃妝投票所";
+  app.innerHTML=`
+  <section class="wrap hero">
+    <div class="eyebrow">2026 縣市長選舉　惡搞專用　11 月 28 日投票</div>
+    <h1>濃妝<em>投票所</em></h1>
+    <p class="lede">把<s>名字</s>和<s>政見</s>蓋起來，你還是會選同一個人嗎？</p>
+    <p class="sub">反過來玩：別人遮名字只看政見，我們遮政見只看門面。四輪分開選，每輪只給你看一樣東西，最後開票看你的眼緣跟誰最合。</p>
+  </section>
+  <section class="wrap">
+    <div class="disclaimer">
+      <span class="disclaimer__tag">先講清楚</span>
+      <p><strong>這是惡搞網站，不是投票參考。</strong>只看政黨和外表投票，是民主社會最不該做的事。</p>
+      <p>真的要投票，請看候選人的政見與中選會選舉公報，這才是民主國家的好公民。</p>
+    </div>
+    <ol class="steps">
+      ${ROUNDS.map((r,i)=>`<li><b><i>${i+1}</i>${r.tab}</b><span>${r.ask}</span></li>`).join("")}
+    </ol>
+    <h2 class="section-title">選你的縣市</h2>
+    <p class="section-note">22 縣市、81 位縣市長候選人。每輪順序打亂、身分遮住；可以跳過，跳過的不計分。</p>
+    <div class="counties">
+      ${DATA.map(d=>`<button class="county" data-go="${d.id}"><b>${d.name}</b><small>${d.cand.length} 位候選人</small></button>`).join("")}
+    </div>
+  </section>`;
+  app.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.go});
+  window.scrollTo(0,0);
+}
+
+function start(d){
+  const rounds=ROUNDS.filter(r=> r.key!=="slogan" || d.cand.filter(c=>c.s).length>=2);
+  state={d,rounds,i:0,picks:{}};
+  round();
+}
+
+/* 競選照輪替：編號 → 額外版本後綴，例如 "taipei-3":["2"] 會在 taipei-3-poster 與 taipei-3-poster-2 之間隨機選一張 */
+const POSTER_ALTS = {"taipei-3":["2"], "taipei-5":["2"]};
+function optInner(key,c,d){
+  const p=pc(c.party);
+  if(key==="party") return `<div class="flag" style="--pc:${p.c};--pt:${p.t}"><b>${esc(c.party)}</b></div>`;
+  if(key==="slogan") return `<div class="banner"><q>${esc(c.s)}</q><small>${KIND_LABEL[c.kind]||""}</small></div>`;
+  const kind = key==="look" ? "look" : "poster";
+  const svg = key==="look" ? lookArt(c,d) : posterArt(c,d);
+  const base = `${d.id}-${c.n}-${kind}`;
+  const alts = kind==="poster" ? (POSTER_ALTS[`${d.id}-${c.n}`]||[]) : [];
+  const pool = [base, ...alts.map(a=>`${base}-${a}`)];
+  const file = pool[Math.floor(Math.random()*pool.length)];
+  return `<div class="photo">${svg}<img src="img/${file}.webp" alt="" onerror="this.remove()"></div>`;
+}
+
+function round(){
+  const {d,rounds,i}=state;
+  const R=rounds[i];
+  const list=shuffle(R.key==="slogan"?d.cand.filter(c=>c.s):d.cand);
+  document.title=`濃妝投票所｜${d.name}｜${R.tab}`;
+  app.innerHTML=`
+  <section class="wrap game">
+    <div class="bar"><button class="back" id="back">← 換縣市</button><span class="eyebrow">${d.name}長　第 ${i+1} / ${rounds.length} 輪</span></div>
+    <ol class="progress">${rounds.map((r,k)=>`<li class="${k<i?"done":k===i?"now":""}">${r.tab}</li>`).join("")}</ol>
+    <h2>${R.title}</h2>
+    <p class="instr">${R.ask}　在你最順眼的那一個<span>蓋章</span>，蓋了就換下一輪。</p>
+    <p class="mini-warn">${R.warn}</p>
+    <div class="wall">
+      ${list.map((c,k)=>`
+      <div class="opt" role="button" tabindex="0" data-n="${c.n}" aria-label="選項 ${LETTERS[k]}">
+        <span class="letter">${LETTERS[k]}</span>
+        ${optInner(R.key,c,d)}
+        <div class="opt__foot">
+          <div class="foot-warn">惡搞用｜投票請看政見</div>
+        </div>
+      </div>`).join("")}
+    </div>
+    <div class="cta">
+      <button class="skip" id="skip">這輪跳過</button>
+    </div>
+  </section>`;
+  const wall=app.querySelector(".wall");
+  let locked=false;
+  const choose=el=>{
+    if(locked) return; locked=true;
+    el.classList.add("is-picked");
+    const s=document.createElement("div");s.className="stamp pop";s.textContent="選";s.setAttribute("aria-hidden","true");el.appendChild(s);
+    const n=+el.dataset.n;
+    const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(()=>go(n), reduce?150:550);
+  };
+  wall.querySelectorAll(".opt").forEach(el=>{
+    el.onclick=()=>choose(el);
+    el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose(el)}};
+  });
+  function go(v){state.picks[R.key]=v; state.i++; state.i<rounds.length?round():reveal()}
+  document.getElementById("skip").onclick=()=>{if(locked)return;locked=true;go(null)};
+  document.getElementById("back").onclick=()=>{location.hash=""};
+  window.scrollTo(0,0);
+}
+
+/* ===== 統計：送出這局的選擇，再讀回大家的結果（onininon.com 上的 Worker + D1）=====
+   預覽環境沒有 api/，失敗就整塊不顯示。選罷法第 53 條期間由 Worker 回 hidden。 */
+const API = "api/";
+async function crowd(d, rounds, picks){
+  const box = document.getElementById("crowd");
+  if(!box) return;
+  const body = { county:d.id, picks:{} };
+  rounds.forEach(r=>{ body.picks[r.key] = picks[r.key] ?? null; });
+  let st;
+  try{
+    await fetch(API+"vote",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body),keepalive:true});
+    const res = await fetch(API+"stats?county="+encodeURIComponent(d.id),{cache:"no-store"});
+    if(!res.ok) return;
+    st = await res.json();
+  }catch(e){ return; }
+  if(!document.body.contains(box)) return;
+  const byN = n=>d.cand.find(c=>c.n===n);
+  if(st.hidden){
+    box.innerHTML = `<h3 class="section-title" style="margin-bottom:0">其他玩家選了誰</h3>
+      <p class="section-note">依《公職人員選舉罷免法》第 53 條，投票日前十日起到投票結束前不公開統計。${d.name}目前累計 ${st.plays||0} 局，投票結束後再回來看。</p>`;
+    box.hidden = false; return;
+  }
+  const rows = rounds.map(r=>{
+    const t = (st.rounds && st.rounds[r.key]) || {};
+    const total = Object.values(t).reduce((a,b)=>a+b,0);
+    if(!total) return "";
+    const list = Object.entries(t).map(([n,v])=>({c:byN(+n),v})).filter(x=>x.c).sort((a,b)=>b.v-a.v);
+    return `<div class="crowd-round"><small>${r.tab}（${total} 票）</small>
+      ${list.map(x=>{const pct=Math.round(x.v/total*100);return `<div class="srow ${x.c.n===picks[r.key]?"mine":""}"><span class="nm">${x.c.n} ${esc(x.c.name)}</span><span class="track"><span class="fill" style="width:${pct}%"></span></span><span class="pct">${pct}%</span></div>`}).join("")}
+    </div>`;
+  }).join("");
+  if(!rows) return;
+  box.innerHTML = `<h3 class="section-title" style="margin-bottom:0">其他玩家選了誰</h3>
+    <p class="section-note">${d.name}累計 ${st.plays||0} 局。這是惡搞遊戲的玩家點選，<strong>不是民調</strong>，沒有任何代表性。名字畫紅線的是你選的。</p>
+    <div class="crowd">${rows}</div>`;
+  box.hidden = false;
+}
+
+function reveal(){
+  const {d,rounds,picks}=state;
+  const answered=rounds.filter(r=>picks[r.key]!=null);
+  const scores=d.cand.map(c=>{
+    const appear=answered.filter(r=>r.key!=="slogan"||c.s);
+    const got=appear.filter(r=>picks[r.key]===c.n).length;
+    return {c,got,of:appear.length,pct:appear.length?Math.round(got/appear.length*100):0};
+  }).sort((a,b)=>b.pct-a.pct||a.c.n-b.c.n);
+  const top=scores[0];
+  const v=VERDICTS[Math.floor(Math.random()*VERDICTS.length)];
+  const byN=n=>d.cand.find(c=>c.n===n);
+  app.innerHTML=`
+  <section class="wrap reveal">
+    <div class="bar"><span class="eyebrow">${d.name}長　開票</span></div>
+    ${answered.length
+      ? `<h2 class="reveal__head">跟你眼緣最合的是 ${top.c.n} 號：${esc(top.c.name)}</h2>`
+      : `<h2 class="reveal__head">四輪全部跳過，你是本站最清醒的人。</h2>`}
+    <p class="verdict">${answered.length?v:"不看門面很好。下一步，去看政見吧。"}</p>
+    <div class="rounds-sum">
+      ${rounds.map(r=>{const c=byN(picks[r.key]);return `<div class="rs"><small>${r.tab}</small>${c?`<b>${c.n} 號 ${esc(c.name)}</b><span>${esc(c.party)}</span>`:`<b>跳過</b><span>這輪不計分</span>`}</div>`}).join("")}
+    </div>
+    ${answered.length?`
+    <div>
+      <h3 class="section-title" style="margin-bottom:0">門面契合度</h3>
+      <p class="section-note">在候選人有出現的輪次裡，你選他的比例。這個數字毫無參考價值。</p>
+      <div class="score">${scores.map(s=>`
+        <div class="srow"><span class="nm">${s.c.n} ${esc(s.c.name)}</span><span class="track"><span class="fill" style="width:${s.pct}%"></span></span><span class="pct">${s.pct}%</span></div>`).join("")}
+      </div>
+    </div>`:""}
+    <div id="crowd" hidden></div>
+    <div class="serious">
+      <h3>好，惡搞結束。現在認真一下。</h3>
+      <p>你剛剛的選擇，只根據政黨、口號、衣服和看板。這些都不會告訴你他上任後要做什麼。民主國家的好公民，投票前會看政見、比政見、查他做不做得到。</p>
+      <div class="links">
+        <a href="https://blindvote.app/${d.id}" target="_blank" rel="noopener">去留白投票所，遮名字只比${d.name}政見 ↗</a>
+        <a class="alt" href="https://www.cec.gov.tw/" target="_blank" rel="noopener">中選會（選舉公報）↗</a>
+      </div>
+    </div>
+    <h3 class="section-title" style="margin-bottom:0">全部翻牌</h3>
+    <p class="section-note">政見還是不在這裡，請去上面的連結看。</p>
+    <div class="result">
+      ${d.cand.map(c=>{const p=pc(c.party);return `
+      <div class="rcard">
+        <div class="rnum" style="background:${p.c};color:${p.t}">${c.n}</div>
+        <div class="rbody">
+          <h4>${esc(c.name)}</h4>
+          <p>${esc(c.party)}</p>
+          ${c.full?`<p class="rslogan">「${esc(c.full)}」<span style="font-weight:400;color:var(--ink-soft)">　${KIND_LABEL[c.kind]||""}</span></p>`:`<p>查無官方口號</p>`}
+        </div>
+      </div>`}).join("")}
+    </div>
+    <div class="again">
+      <button class="btn" id="replay">${d.name}再選一次</button>
+      <button class="btn btn--ghost" id="other">換別的縣市</button>
+    </div>
+    <p class="mini-warn">再提醒一次：本站純屬惡搞，不代表任何投票建議，也不支持或反對任何候選人。</p>
+  </section>`;
+  crowd(d, rounds, picks);
+  document.getElementById("replay").onclick=()=>start(d);
+  document.getElementById("other").onclick=()=>{location.hash=""};
+  window.scrollTo(0,0);
+}
+
+function route(){
+  const d=DATA.find(x=>x.id===location.hash.replace("#",""));
+  d?start(d):home();
+}
+window.addEventListener("hashchange",route);
+route();
+
+(function(){
+  const gate=document.getElementById("gate"),btn=document.getElementById("gateBtn");
+  gate.hidden=false;
+  btn.onclick=()=>{ gate.hidden=true; };
+})();
+</script>
+
+</body>
+</html>

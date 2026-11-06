@@ -1,0 +1,15 @@
+# PR check: the files cf-deploy.sh publishes exist and wrangler accepts the config (no upload).
+name: Check deploy config
+
+on:
+  pull_request:
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: DRY_RUN=1 scripts/cf-deploy.sh

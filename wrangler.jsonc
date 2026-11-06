@@ -1,0 +1,28 @@
+// Cloudflare Workers：https://onininon.com/nongzhuang-vote/ 濃妝投票所（惡搞選舉小遊戲）。
+// 靜態檔由 Cloudflare 直接出；/nongzhuang-vote/api/* 先進 worker/index.js（統計，存在 D1）。
+// 部署：Cloudflare Workers Builds 在 release 分支有新提交時跑 scripts/cf-deploy.sh（沒有建置指令）。
+// 資源資料夾 cf-dist/ 是那支腳本把 index.html 和 img/ 放進 nongzhuang-vote/ 子資料夾做出來的（網址路徑 = 資料夾路徑）。
+// 首頁是另一個 Worker（onininon-site，route onininon.com/*），這裡的 route 比較精確所以先吃到。
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nongzhuang-vote",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  // 第一次部署時如果還沒有就自動建立
+  "d1_databases": [{ "binding": "DB", "database_name": "nongzhuang-vote" }],
+  "assets": {
+    "directory": "./cf-dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/nongzhuang-vote/api/*"],
+    // /nongzhuang-vote → /nongzhuang-vote/（網頁用相對路徑 img/、api/，一定要有結尾斜線）
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "routes": [
+    { "pattern": "onininon.com/nongzhuang-vote", "zone_name": "onininon.com" },
+    { "pattern": "onininon.com/nongzhuang-vote/*", "zone_name": "onininon.com" },
+    { "pattern": "www.onininon.com/nongzhuang-vote", "zone_name": "onininon.com" },
+    { "pattern": "www.onininon.com/nongzhuang-vote/*", "zone_name": "onininon.com" }
+  ]
+}
