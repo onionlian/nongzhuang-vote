@@ -5,7 +5,7 @@
 // GET  api/stats?county=taipei                                回傳該縣市每輪每個號次的票數。
 //
 // 選罷法第 53 條：投票日前十日起至投票時間截止前不得發布民調。
-// BLACKOUT 期間 stats 只回局數；帶 ?key=<STATS_KEY>（wrangler secret）的請求不受限，給站長自己看。
+// BLACKOUT 期間 stats 只回局數；要看完整數字請直接查 D1（見 README）。
 // 每個 IP 每小時最多 VOTES_PER_HOUR 局（IP 用每日換鹽的雜湊，不存原始 IP，兩天後刪）。
 
 const BASE = '/nongzhuang-vote/api/';
@@ -79,15 +79,14 @@ async function vote(req, env) {
 async function stats(url, env) {
   const county = url.searchParams.get('county') || '';
   if (!COUNTIES[county]) return json({ error: 'county' }, 400);
-  const owner = env.STATS_KEY && url.searchParams.get('key') === env.STATS_KEY;
   const p = await env.DB.prepare('SELECT n FROM plays WHERE county = ?').bind(county).first();
   const plays = p?.n || 0;
   const noStore = { 'cache-control': 'no-store' };
-  if (inBlackout() && !owner) return json({ county, plays, hidden: true }, 200, noStore);
+  if (inBlackout()) return json({ county, plays, hidden: true }, 200, noStore);
   const { results } = await env.DB.prepare('SELECT round, n, votes FROM tally WHERE county = ?').bind(county).all();
   const rounds = {};
   for (const r of results) (rounds[r.round] ||= {})[r.n] = r.votes;
-  return json({ county, plays, hidden: false, rounds }, 200, owner ? noStore : { 'cache-control': 'public, max-age=30' });
+  return json({ county, plays, hidden: false, rounds }, 200, { 'cache-control': 'public, max-age=30' });
 }
 
 export default {

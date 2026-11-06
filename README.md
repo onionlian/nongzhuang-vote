@@ -11,8 +11,7 @@
 
 - 每局開票時送出四輪選擇，只存加總票數，不存個人資料。
 - 依選罷法第 53 條，2026-11-18 00:00 到 11-28 16:00（台北時間）公開頁面只顯示局數。
-- 站長隨時可看完整數字：`https://onininon.com/nongzhuang-vote/api/stats?county=taipei&key=<STATS_KEY>`
-  （`npx wrangler secret put STATS_KEY` 設定）
+- 禁止期間要看完整數字，直接查 D1：`npx wrangler d1 execute nongzhuang-vote --remote --command "SELECT * FROM tally WHERE county='taipei'"`
 
 ## 部署
 
