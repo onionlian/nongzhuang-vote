@@ -3,7 +3,7 @@
 網站實際使用的名單，從 index.html 的 DATA 產生。共 22 縣市、81 位。
 
 - 號次與黨籍：中選會 2026-10-27 號次抽籤結果（[中央社號次一覽](https://www.cna.com.tw/news/aipl/202610275002.aspx)）
-- 圖檔放在 img/（900×1200 WebP）；輪替版命名為 {縣市id}-{號次}-poster-{n}.webp、{縣市id}-{號次}-look-{n}.webp（n 從 2 起算；已重繪完成的候選人張數不限，待重繪的每人最多 4 張），並在 index.html 的 POSTER_ALTS、LOOK_ALTS 登記
+- 圖檔放在 img/（900×1200 WebP）；輪替版命名為 {縣市id}-{號次}-poster-{n}.webp、{縣市id}-{號次}-look-{n}.webp（n 從 2 起算；已採用的重繪圖張數不限；待重繪的六都每人最多 4 張、其他縣市最多 2 張），並在 index.html 的 POSTER_ALTS、LOOK_ALTS 登記
 - 原圖與重繪待辦在 source/（不進版控），見 source/重繪待辦.md
 - 同一份資料的機器可讀版本：candidates.json
 
