@@ -55,7 +55,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .hero{padding-block:36px 8px;display:grid;gap:14px}
 .eyebrow{font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--ink-soft)}
 .hero h1{font-family:var(--display);font-weight:900;font-size:clamp(48px,12vw,104px);line-height:1;margin:0;letter-spacing:.02em}
-.hero h1 em{font-style:normal;color:var(--paper);background:var(--ink);padding:0 .12em;border-radius:4px}
+.hero h1 em{display:inline-block;line-height:1.12;margin-top:.1em;font-style:normal;color:var(--paper);background:var(--ink);padding:0 .12em;border-radius:4px}
 .lede{font-size:clamp(18px,3.4vw,24px);font-weight:700;margin:0;text-wrap:balance;max-width:28em}
 .lede s{text-decoration-thickness:3px;text-decoration-color:var(--stamp)}
 .sub{color:var(--ink-soft);margin:0;max-width:38em}
@@ -528,12 +528,23 @@ function start(d){
   round();
 }
 
-/* 競選照輪替：編號 → 額外版本後綴，依順序輪流出現（第一張是主競選照，每次進第四輪換下一張）。
-   檔名是 {編號}-poster.webp、{編號}-poster-{後綴}.webp */
+/* 競選照、外表照輪替：編號 → 額外版本後綴，依順序輪流出現（第一張是主圖，每次進該輪或按「其他的圖片」換下一張）。已重繪完成的候選人張數不限，其餘每人最多 4 張。
+   檔名是 {編號}-poster.webp、{編號}-poster-{後綴}.webp；外表照是 {編號}-look.webp、{編號}-look-{後綴}.webp。 */
 const POSTER_ALTS = {
-  "taipei-3": ["2","3","4","5","6","11","12","13","14","15","16"],
-  "taipei-5": ["2","6","7","8","9","10","11","12","13","14","15"]
+  "taipei-3": ["2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"],
+  "taipei-5": ["2","3","4","5","6","7","8","9","10"],
+  "taichung-1": ["2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18"],
+  "taoyuan-1": ["2"],
+  "taoyuan-2": ["2"]
 };
+const LOOK_ALTS = {
+  "taipei-3": ["2","3","4","5","6","7","8","9","10","11","12","13","14","15"],
+  "taipei-5": ["2","3","4","5","6","7"],
+  "taichung-1": ["2","3","4","5","6","7","8","9","10","11","12","13","14"],
+  "taoyuan-1": ["2"],
+  "taoyuan-2": ["2"]
+};
+const imgAlts = (kind,key) => ((kind==="look" ? LOOK_ALTS : POSTER_ALTS)[key]||[]);
 function nextPoster(key, pool){
   let i = 0;
   try{ i = (parseInt(localStorage.getItem("nzv-rot-"+key)||"-1",10)+1) % pool.length; localStorage.setItem("nzv-rot-"+key, String(i)); }
@@ -547,9 +558,9 @@ function optInner(key,c,d){
   const kind = key==="look" ? "look" : "poster";
   const svg = key==="look" ? lookArt(c,d) : posterArt(c,d);
   const base = `${d.id}-${c.n}-${kind}`;
-  const alts = kind==="poster" ? (POSTER_ALTS[`${d.id}-${c.n}`]||[]) : [];
+  const alts = imgAlts(kind, `${d.id}-${c.n}`);
   const pool = [base, ...alts.map(a=>`${base}-${a}`)];
-  const file = pool.length>1 ? nextPoster(`${d.id}-${c.n}`, pool) : pool[0];
+  const file = pool.length>1 ? nextPoster((kind==="look"?"look-":"")+`${d.id}-${c.n}`, pool) : pool[0];
   return `<div class="photo">${svg}<img src="${SITE}img/${file}.webp" alt="" onerror="this.remove()"></div>`;
 }
 
@@ -560,7 +571,7 @@ function round(keep){
   if(!keep || !state.order[R.key]) state.order[R.key] = shuffle(d.cand.map(c=>c.n));
   const list = state.order[R.key].map(n=>d.cand.find(c=>c.n===n));
   const moreBtn = R.key==="slogan" ? (d.cand.some(c=>c.slogans.length>1) ? "有其他口號嗎" : "")
-    : R.key==="poster" ? (d.cand.some(c=>(POSTER_ALTS[`${d.id}-${c.n}`]||[]).length) ? "我都不喜歡，有其他的圖片嗎" : "") : "";
+    : (R.key==="poster"||R.key==="look") ? (d.cand.some(c=>imgAlts(R.key, `${d.id}-${c.n}`).length) ? "我都不喜歡，有其他的圖片嗎" : "") : "";
   setMeta(`${d.name}長｜濃妝投票所`, countyDesc(d), ORIGIN_URL+d.id+"/");
   app.innerHTML=`
   <section class="wrap game">
@@ -731,11 +742,12 @@ function renderPreview(){
   const total={cand:0,slogans:0,looks:0,posters:0};
   const body=DATA.map(d=>`<section class="pv-county" id="pv-${d.id}"><h2>${d.name}　<small>${d.cand.length} 位</small></h2>
     <div class="pv-grid">${d.cand.map(c=>{ total.cand++; total.slogans+=c.slogans.length;
-      const alts=POSTER_ALTS[`${d.id}-${c.n}`]||[]; const posters=[`${d.id}-${c.n}-poster`,...alts.map(a=>`${d.id}-${c.n}-poster-${a}`)];
+      const files=k=>[`${d.id}-${c.n}-${k}`,...imgAlts(k,`${d.id}-${c.n}`).map(a=>`${d.id}-${c.n}-${k}-${a}`)];
+      const looks=files("look"), posters=files("poster");
       const p=pc(c.party);
       return `<article class="pv-cand"><header><span class="rnum" style="background:${p.c};color:${p.t}">${c.n}</span><div><b>${esc(c.name)}</b><br><small>${esc(c.party)}</small></div></header>
         <div class="pv-sl">${c.slogans.length?c.slogans.map((x,i)=>`<div>${i===0?"★ ":""}「${esc(x.t)}」<small>${KIND_LABEL[x.kind]||""}</small></div>`).join(""):`<div class="pv-none">查無公開口號</div>`}</div>
-        <div class="pv-imgs">${img(`${d.id}-${c.n}-look`,"外表")}${posters.map((f,i)=>img(f, i?`競選照 ${i+1}/${posters.length}`:`競選照 主`)).join("")}</div>
+        <div class="pv-imgs">${looks.map((f,i)=>img(f, looks.length>1?(i?`外表 ${i+1}/${looks.length}`:`外表 主`):"外表")).join("")}${posters.map((f,i)=>img(f, i?`競選照 ${i+1}/${posters.length}`:`競選照 主`)).join("")}</div>
       </article>`;}).join("")}</div></section>`).join("");
   app.innerHTML=`<section class="wrap game"><div class="bar"><button class="back" id="back">← 回首頁</button><span class="eyebrow">站長預覽　不公開</span></div>
     <h2>素材預覽</h2><p class="mini-warn">${total.cand} 位候選人、${total.slogans} 句口號。★ 是主口號（翻牌頁顯示這句）；口號已套用遮名規則；缺圖的位置遊戲裡會顯示內建插畫。</p>

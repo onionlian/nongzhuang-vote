@@ -3,3 +3,6 @@ node_modules/
 .env
 cf-dist/
 .wrangler/
+
+# 原圖、重繪暫存與備查（不進版控）
+source/
