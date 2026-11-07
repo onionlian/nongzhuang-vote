@@ -118,14 +118,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .art{display:block;width:100%;height:auto;aspect-ratio:3/4;max-width:100%;background:var(--paper-2)}
 .photo{position:relative;aspect-ratio:3/4;max-width:100%;overflow:hidden;background:var(--paper-2)}
 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-/* 非直式圖：圖檔是 3:4 補模糊邊，框改成原比例、圖寬貼齊後垂直置中，只露出清楚的畫面 */
+/* 寬圖（WIDE 以上）：圖檔是 3:4 補模糊邊，框改成原比例、圖寬貼齊後垂直置中，只露出清楚的畫面 */
 .photo.fit img{inset:auto 0;top:50%;height:auto;transform:translateY(-50%)}
 .photo.fit .art{position:absolute;inset:0;width:100%;height:100%}
-.wall{align-items:start}
 .opt.wide{grid-column:1/-1}
-/* 沒有這位的圖：改放共用圖（img/_oops-{poster,look}-{m,f}，男女分開），中間疊一條自嘲字（像打碼說明）；共用圖也沒有就只剩內建插畫＋字 */
-.photo.oops::after{content:attr(data-cap);position:absolute;left:8%;right:8%;top:50%;background:var(--ink);color:#fff;font-weight:900;font-size:14px;line-height:1.4;padding:8px 10px;text-align:center;text-wrap:balance;transform:rotate(-3deg)}
-@media (min-width:600px){.opt.wide{grid-column:span 2}}
+/* 沒有照片的候選人：放共用圖 img/_oops-{poster,look}-{m,f}（男女分開，右下角貼紙由 source/scripts/oops_bake.py 畫進圖裡） */
+/* 桌機：寬圖佔兩欄、框固定 3:2，跟同列 3:4 的卡片等高（同列卡片會拉成一樣高） */
+@media (min-width:600px){.opt.wide{grid-column:span 2}.opt.wide .photo{aspect-ratio:3/2!important}}
 .photo .mask{position:absolute;background:var(--ink);display:grid;place-items:center;color:#fff;font-weight:900;font-size:12px;transform:rotate(-3deg)}
 
 .cta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-bottom:28px}
@@ -638,6 +637,7 @@ const LOOK_ALTS = {
   "kinmen-5": ["2"],
   "kinmen-6": ["2"]
 };
+const NO_IMG = new Set(["taipei-1","taipei-2","taipei-4","taipei-6","newtaipei-2","taichung-2","tainan-1","kaohsiung-1","kaohsiung-4","keelung-2","nantou-1","yunlin-1","chiayicity-1","chiayicity-2","chiayicity-5","pingtung-2","yilan-2","yilan-4","yilan-5","hualien-4","taitung-3","penghu-1","penghu-5","penghu-6","kinmen-1","kinmen-3","kinmen-7","lienchiang-1","lienchiang-2"]);
 const IMG_RATIO = {"changhua-1-poster-2":1.0,"changhua-1-poster":1.0,"changhua-2-poster-2":1.0,"changhua-2-poster":1.0,"changhua-3-poster-2":1.0,"changhua-3-poster":2.63,"changhua-4-poster":1.79,"chiayicity-3-poster-2":1.0,"chiayicity-3-poster":1.0,"chiayicity-4-poster-2":1.0,"chiayicity-4-poster":2.63,"chiayicounty-1-poster-2":1.41,"chiayicounty-1-poster":1.92,"chiayicounty-2-poster-2":1.0,"chiayicounty-2-poster":1.0,"hsinchucity-1-poster-2":1.0,"hsinchucity-1-poster":2.6,"hsinchucity-2-poster-2":1.34,"hsinchucity-2-poster":1.0,"hsinchucity-3-poster-2":1.0,"hsinchucity-3-poster":2.63,"hsinchucounty-1-poster":1.0,"hsinchucounty-2-poster-2":1.0,"hsinchucounty-2-poster":1.79,"hsinchucounty-3-poster-2":1.0,"hsinchucounty-3-poster":1.33,"hualien-1-poster-2":1.0,"hualien-1-poster-3":1.0,"hualien-1-poster":1.0,"hualien-2-poster-2":2.28,"hualien-2-poster-3":1.0,"hualien-2-poster":1.0,"hualien-3-poster-2":1.0,"hualien-3-poster":1.0,"kaohsiung-3-poster-2":1.42,"kaohsiung-3-poster-4":1.0,"kaohsiung-3-poster":1.0,"kaohsiung-5-poster-2":1.0,"kaohsiung-5-poster-3":1.0,"kaohsiung-5-poster-4":1.0,"kaohsiung-5-poster":1.0,"keelung-1-poster":2.6,"kinmen-4-poster-2":1.55,"kinmen-4-poster":1.0,"kinmen-5-poster":1.0,"kinmen-6-poster-2":2.67,"kinmen-6-poster":0.95,"miaoli-1-poster-2":0.85,"miaoli-1-poster":1.0,"miaoli-2-poster-2":2.6,"miaoli-2-poster":1.79,"nantou-2-poster":1.08,"newtaipei-1-poster-2":1.0,"newtaipei-1-poster":1.0,"newtaipei-3-poster-2":1.0,"newtaipei-3-poster-3":1.0,"newtaipei-3-poster-4":1.0,"newtaipei-3-poster":1.0,"penghu-2-poster-2":0.85,"penghu-3-poster-2":1.78,"penghu-3-poster":1.0,"penghu-4-poster-2":1.0,"penghu-4-poster":1.0,"pingtung-1-poster-2":1.33,"pingtung-1-poster":1.0,"taichung-1-poster-10":1.0,"taichung-1-poster-11":1.0,"taichung-1-poster-12":1.78,"taichung-1-poster-13":1.0,"taichung-1-poster-14":1.0,"taichung-1-poster-15":1.0,"taichung-1-poster-16":1.0,"taichung-1-poster-18":1.0,"taichung-1-poster-2":1.0,"taichung-1-poster-3":1.0,"taichung-1-poster-4":1.0,"taichung-1-poster-5":1.0,"taichung-1-poster-6":1.0,"taichung-1-poster-7":1.0,"taichung-1-poster-8":1.0,"taichung-1-poster-9":1.0,"taichung-1-poster":1.0,"taichung-3-poster-2":1.09,"taichung-3-poster-3":1.0,"taichung-3-poster-4":1.0,"taichung-3-poster":2.52,"tainan-2-poster-2":1.0,"tainan-2-poster-3":1.0,"tainan-2-poster-4":1.0,"tainan-2-poster":1.0,"tainan-3-poster-3":1.0,"tainan-3-poster":1.0,"tainan-4-poster-2":1.5,"tainan-4-poster":1.28,"taipei-3-poster-10":2.6,"taipei-3-poster-11":1.0,"taipei-3-poster-12":1.0,"taipei-3-poster-13":1.0,"taipei-3-poster-14":1.0,"taipei-3-poster-15":1.0,"taipei-3-poster-16":1.0,"taipei-3-poster-17":1.0,"taipei-3-poster-18":1.0,"taipei-3-poster-19":1.0,"taipei-3-poster-2":1.0,"taipei-3-poster-20":1.0,"taipei-3-poster-21":1.0,"taipei-3-poster-22":1.0,"taipei-3-poster-23":1.0,"taipei-3-poster-24":1.78,"taipei-3-poster-25":1.0,"taipei-3-poster-26":1.0,"taipei-3-poster-27":1.0,"taipei-3-poster-28":1.0,"taipei-3-poster-29":2.6,"taipei-3-poster-3":1.0,"taipei-3-poster-4":1.0,"taipei-3-poster-6":1.0,"taipei-3-poster-7":1.0,"taipei-3-poster-8":1.0,"taipei-3-poster-9":1.0,"taipei-3-poster":1.0,"taipei-5-poster-10":1.0,"taipei-5-poster-2":1.0,"taipei-5-poster-3":1.0,"taipei-5-poster-4":1.0,"taipei-5-poster-5":1.0,"taipei-5-poster-6":1.0,"taipei-5-poster-7":1.0,"taipei-5-poster-8":1.0,"taipei-5-poster-9":1.0,"taipei-5-poster":1.0,"taitung-1-poster-2":1.66,"taitung-2-poster":1.0,"taitung-4-poster-2":2.01,"taitung-4-poster":2.01,"taoyuan-1-poster-2":1.78,"taoyuan-1-poster":1.0,"taoyuan-2-poster-2":1.5,"taoyuan-2-poster":1.0,"yilan-1-poster":1.0,"yilan-3-poster-3":1.0,"yilan-3-poster-4":1.0,"yilan-3-poster":1.5,"yunlin-2-poster":2.71,"yunlin-3-poster-2":1.79,"yunlin-3-poster":1.79,"yunlin-4-poster":1.0};
 const imgAlts = (kind,key) => ((kind==="look" ? LOOK_ALTS : POSTER_ALTS)[key]||[]);
 function nextPoster(key, pool){
@@ -652,20 +652,22 @@ function optInner(key,c,d){
   if(key==="slogan"){ if(!c.slogans.length) return `<div class="banner"><q class="none">查無公開口號</q><small>這位候選人沒有找到競選口號</small></div>`; const sl=c.slogans[(state?.rot||0)%c.slogans.length]; return `<div class="banner"><q>${esc(sl.t)}</q><small>${KIND_LABEL[sl.kind]||""}</small></div>`; }
   const kind = key==="look" ? "look" : "poster";
   const svg = key==="look" ? lookArt(c,d) : posterArt(c,d);
+  const cid = `${d.id}-${c.n}`;
+  const g = OOPS_F.has(cid) ? "f" : "m";
+  if(NO_IMG.has(cid)) return `<div class="photo oops">${svg}<img src="${SITE}img/_oops-${kind}-${g}.webp?v=2" alt="" onerror="this.remove()"></div>`;
   const file = pickFile(kind,c,d);
-  const r = IMG_RATIO[file];
-  return `<div class="photo${r?" fit":""}"${r?` style="aspect-ratio:${r}"`:""} data-cap="${OOPS_CAP[kind]}">${svg}<img src="${SITE}img/${file}.webp" alt="" data-kind="${kind}" data-g="${OOPS_F.has(`${d.id}-${c.n}`)?"f":"m"}" onerror="oops(this)"></div>`;
+  const r = (IMG_RATIO[file]||0) >= WIDE ? IMG_RATIO[file] : 0;
+  return `<div class="photo${r?" fit":""}"${r?` style="aspect-ratio:${r}"`:""}>${svg}<img src="${SITE}img/${file}.webp" alt="" data-kind="${kind}" data-g="${g}" onerror="oops(this)"></div>`;
 }
 // 沒有照片的候選人裡的女性（共用圖用女版）
 const OOPS_F = new Set(["nantou-1","pingtung-2","taichung-2","yilan-5"]);
-const OOPS_CAP = {poster:"小編不夠用心，找不到這位的競選照", look:"小編太混，找不到這位的照片"};
 function oops(img){
   const p = img.parentNode;
   if(p.classList.contains("oops")){ img.remove(); return; }
   p.classList.add("oops"); p.classList.remove("fit"); p.style.aspectRatio = "";
-  img.src = `${SITE}img/_oops-${img.dataset.kind}-${img.dataset.g}.webp`;
+  img.src = `${SITE}img/_oops-${img.dataset.kind}-${img.dataset.g}.webp?v=2`;
 }
-const WIDE = 1.4;  // 比這寬的圖整列顯示、排在最前面
+const WIDE = 1.5;  // 這麼寬以上的圖佔兩欄（手機整列）、排在最前面；其他圖一律 3:4 框
 function pickFile(kind,c,d){
   const key = `${d.id}-${c.n}`;
   state.files = state.files || {};
