@@ -196,6 +196,9 @@ footer .wrap{padding-block:22px 28px;display:grid;gap:10px;font-size:14px;color:
 footer strong{color:var(--ink)}
 footer p{margin:0;max-width:60em}
 footer .recaptcha-note{font-size:12px}
+footer .report{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;border:3px solid var(--ink);background:#fff;padding:12px 16px;margin:16px 0}
+footer .report p{margin:0;flex:1 1 260px}
+footer .report .btn{font-size:16px;padding:9px 14px}
 .grecaptcha-badge{visibility:hidden}
 .big-foot{font-family:var(--display);font-weight:900;font-size:22px;color:var(--stamp)}
 
@@ -233,6 +236,10 @@ footer .recaptcha-note{font-size:12px}
     <p>致敬並反轉自 <a href="https://blindvote.app" target="_blank" rel="noopener">留白投票所 blindvote.app</a>：他們遮名字只看政見，我們遮政見只看門面。要認真比較政見，請去那裡，或看中選會的選舉公報。</p>
     <p>本站不支持、不反對任何候選人或政黨。號次與黨籍依中選會號次抽籤結果（2026-10-27）；口號整理自候選人公開活動與新聞報導，標註「抽籤喊話」「競選主軸」者不一定是正式口號，若有錯誤以候選人官方為準。口號裡出現候選人名字中兩個以上的字才會遮住，只有一個字照原文。外表與競選照兩輪是插畫重繪，不是候選人官方文宣；頭像為統一卡通臉，不代表候選人本人長相。</p>
     <p>資料整理：2026-11-06。</p>
+    <div class="report">
+      <p><strong>資料有錯、圖片怪怪的、網站壞掉？</strong>跟我們說，看到就修。也可以寫信到 <a href="mailto:hi@onininon.com">hi@onininon.com</a>。</p>
+      <button type="button" class="btn btn--ghost" id="report" hidden>🐞 問題回報</button>
+    </div>
     <p class="recaptcha-note">投票統計用 reCAPTCHA 擋機器人，適用 Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">隱私權政策</a>與<a href="https://policies.google.com/terms" target="_blank" rel="noopener">服務條款</a>。</p>
   </div>
 </footer>
@@ -275,6 +282,26 @@ function recaptchaToken(action){
     let tries = 0;
     const wait = setInterval(()=>{ if(window.grecaptcha && grecaptcha.ready){ clearInterval(wait); run(); } else if(++tries>45){ clearInterval(wait); done(""); } }, 100);
   });
+}
+/* 問題回報：onininon.com 全站共用的回饋視窗（/account/oni.js，進同一份 Google 表單，遊戲欄 nongzhuang-vote）。
+   只在正式站載入；回饋 API 沒開時按鈕不出現（信箱一直都在）。 */
+if(GA_ON){
+  const s = document.createElement("script"); s.src = "/account/oni.js"; s.defer = true;
+  s.onload = ()=>{
+    if(!window.Oni) return;
+    Oni.init({ game:"nongzhuang-vote", version:"2026-11-09", lang:"zh", where:()=>{
+      if(!state) return "首頁";
+      const R = state.rounds && state.rounds[state.i];
+      return R ? `${state.d.name}·${R.tab}` : `${state.d.name}·開票`;
+    }});
+    Oni.ready().then(()=>{
+      if(!Oni.feedbackEnabled) return;
+      const btn = document.getElementById("report");
+      btn.hidden = false;
+      btn.onclick = ()=>{ Oni.openFeedback(); track("feedback_open",{where:"footer"}); };
+    });
+  };
+  document.head.appendChild(s);
 }
 function track(name, params){ try{ if(GA_ON && window.gtag) gtag("event", name, params||{}); }catch(e){} }
 function pageView(){ track("page_view", { page_title:document.title, page_location:location.href, page_path:location.pathname }); }
